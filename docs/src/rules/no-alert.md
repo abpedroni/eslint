@@ -1,6 +1,5 @@
 ---
 title: no-alert
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-console
@@ -48,7 +47,7 @@ customConfirm("Are you sure?");
 customPrompt("Who are you?");
 
 function foo() {
-    var alert = myCustomLib.customAlert;
+    const alert = myCustomLib.customAlert;
     alert();
 }
 ```

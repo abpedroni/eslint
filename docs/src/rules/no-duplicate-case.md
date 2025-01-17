@@ -1,6 +1,5 @@
 ---
 title: no-duplicate-case
-layout: doc
 rule_type: problem
 ---
 
@@ -19,7 +18,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-duplicate-case: "error"*/
 
-var a = 1,
+const a = 1,
     one = 1;
 
 switch (a) {
@@ -65,7 +64,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-duplicate-case: "error"*/
 
-var a = 1,
+const a = 1,
     one = 1;
 
 switch (a) {

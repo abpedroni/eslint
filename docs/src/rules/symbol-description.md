@@ -1,6 +1,5 @@
 ---
 title: symbol-description
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://www.ecma-international.org/ecma-262/6.0/#sec-symbol-description
@@ -39,7 +38,6 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint symbol-description: "error"*/
-/*eslint-env es6*/
 
 var foo = Symbol();
 ```
@@ -52,7 +50,6 @@ Examples of **correct** code for this rule:
 
 ```js
 /*eslint symbol-description: "error"*/
-/*eslint-env es6*/
 
 var foo = Symbol("some description");
 

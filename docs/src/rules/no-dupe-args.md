@@ -1,7 +1,7 @@
 ---
 title: no-dupe-args
-layout: doc
 rule_type: problem
+handled_by_typescript: true
 ---
 
 
@@ -16,7 +16,7 @@ If ESLint parses code in strict mode, the parser (instead of this rule) reports 
 
 Examples of **incorrect** code for this rule:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-dupe-args: "error"*/
@@ -25,7 +25,7 @@ function foo(a, b, a) {
     console.log("value of the second a:", a);
 }
 
-var bar = function (a, b, a) {
+const bar = function (a, b, a) {
     console.log("value of the second a:", a);
 };
 ```
@@ -34,7 +34,7 @@ var bar = function (a, b, a) {
 
 Examples of **correct** code for this rule:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-dupe-args: "error"*/
@@ -43,7 +43,7 @@ function foo(a, b, c) {
     console.log(a, b, c);
 }
 
-var bar = function (a, b, c) {
+const bar = function (a, b, c) {
     console.log(a, b, c);
 };
 ```

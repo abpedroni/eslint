@@ -1,6 +1,5 @@
 ---
 title: no-case-declarations
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-fallthrough
@@ -26,7 +25,6 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint no-case-declarations: "error"*/
-/*eslint-env es6*/
 
 switch (foo) {
     case 1:
@@ -51,7 +49,6 @@ Examples of **correct** code for this rule:
 
 ```js
 /*eslint no-case-declarations: "error"*/
-/*eslint-env es6*/
 
 // Declarations outside switch-statements are valid
 const a = 0;

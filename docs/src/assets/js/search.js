@@ -22,6 +22,7 @@ const resultsElement = document.querySelector('#search-results');
 const resultsLiveRegion = document.querySelector('#search-results-announcement');
 const searchInput = document.querySelector('#search');
 const searchClearBtn = document.querySelector('#search__clear-btn');
+const poweredByLink = document.querySelector('.search_powered-by-wrapper');
 let activeIndex = -1;
 let searchQuery;
 
@@ -36,20 +37,42 @@ let searchQuery;
  */
 function fetchSearchResults(query) {
     return index.search(query, {
-        // facetFilters: ["tags:docs"]
+        facetFilters: ["tags:docs"]
     }).then(({ hits }) => hits);
 }
 
 /**
- * Removes any current search results from the display.
- * @returns {void}
+ * Clears the search results from the display.
+ * If the removeEventListener flag is true, removes the click event listener from the document.
+ * @param {boolean} [removeEventListener=false] - Optional flag to indicate if the click event listener should be removed. Default is false.
+ * @returns {void} - This function doesn't return anything.
  */
-function clearSearchResults() {
-    while (resultsElement.firstChild) {
-        resultsElement.removeChild(resultsElement.firstChild);
-    }
+function clearSearchResults(removeEventListener = false) {
     resultsElement.innerHTML = "";
-    searchClearBtn.setAttribute('hidden', '');
+    if (removeEventListener && document.clickEventAdded) {
+        document.removeEventListener('click', handleDocumentClick);
+        document.clickEventAdded = false;
+    }
+}
+
+/**
+ * Displays a "No results found" message in both the live region and results display area.
+ * This is typically used when no matching results are found in the search.
+ * @returns {void} - This function doesn't return anything.
+ */
+function showNoResults() {
+    resultsLiveRegion.innerHTML = "No results found.";
+    resultsElement.innerHTML = "No results found.";
+    resultsElement.setAttribute('data-results', 'false');
+}
+
+/**
+ * Clears any "No results found" message from the live region and results display area.
+ * @returns {void} - This function doesn't return anything.
+ */
+function clearNoResults() {
+    resultsLiveRegion.innerHTML = "";
+    resultsElement.innerHTML = "";
 }
 
 /**
@@ -80,13 +103,9 @@ function displaySearchResults(results) {
             `.trim();
             list.append(listItem);
         }
-        searchClearBtn.removeAttribute('hidden');
 
     } else {
-        resultsLiveRegion.innerHTML = "No results found.";
-        resultsElement.innerHTML = "No results found.";
-        resultsElement.setAttribute('data-results', 'false');
-        searchClearBtn.setAttribute('hidden', '');
+        showNoResults();
     }
 
 }
@@ -114,51 +133,105 @@ function maintainScrollVisibility(activeElement, scrollParent) {
 
 }
 
+/**
+ * Debounces the provided callback with a given delay.
+ * @param {Function} callback The callback that needs to be debounced.
+ * @param {Number} delay Time in ms that the timer should wait before the callback is executed.
+ * @returns {Function} Returns the new debounced function.
+ */
+function debounce(callback, delay) {
+    let timer;
+    return (...args) => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => callback.apply(this, args), delay);
+    }
+}
+
+/**
+ * Debounced function to fetch search results after 300ms of inactivity.
+ * Calls `fetchSearchResults` to retrieve data and `displaySearchResults` to show them.
+ * If an error occurs, clears the search results.
+ * @param {string} query - The search query.
+ * @returns {void} - No return value.
+ * @see debounce - Limits the number of requests during rapid typing.
+ */
+const debouncedFetchSearchResults = debounce((query) => {
+    fetchSearchResults(query)
+        .then(displaySearchResults)
+        .catch(() => { clearSearchResults(true) });
+}, 300);
+
+
+/**
+ * Handles the document click event to clear search results if the user clicks outside of the search input or results element.
+ * @param {MouseEvent} e - The event object representing the click event.
+ * @returns {void} - This function does not return any value. It directly interacts with the UI by clearing search results.
+ */
+const handleDocumentClick = (e) => {
+    if (e.target !== resultsElement && e.target !== searchInput) {
+        clearSearchResults(true);
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 // Event Handlers
 //-----------------------------------------------------------------------------
 
 // listen for input changes
-if(searchInput)
+if (searchInput)
     searchInput.addEventListener('keyup', function (e) {
         const query = searchInput.value;
 
-        if(query === searchQuery) return;
+        if (query === searchQuery) return;
 
-        if(query.length) searchClearBtn.removeAttribute('hidden');
+        if (query.length) searchClearBtn.removeAttribute('hidden');
         else searchClearBtn.setAttribute('hidden', '');
 
         if (query.length > 2) {
-            fetchSearchResults(query)
-                .then(displaySearchResults)
-                .catch(clearSearchResults);
-
-            document.addEventListener('click', function(e) {
-                if(e.target !== resultsElement) clearSearchResults();
-            });
+            debouncedFetchSearchResults(query);
+            if (!document.clickEventAdded) {
+                document.addEventListener('click', handleDocumentClick);
+                document.clickEventAdded = true;
+            }
         } else {
-            clearSearchResults();
+            clearSearchResults(true);
         }
 
-    searchQuery = query
+        searchQuery = query
 
     });
 
 
-if(searchClearBtn)
-    searchClearBtn.addEventListener('click', function(e) {
+if (searchClearBtn)
+    searchClearBtn.addEventListener('click', function (e) {
         searchInput.value = '';
         searchInput.focus();
-        clearSearchResults();
+        clearSearchResults(true);
+        searchClearBtn.setAttribute('hidden', '');
     });
+
+if (poweredByLink) {
+    poweredByLink.addEventListener('focus', function () {
+       clearSearchResults();
+    });
+}
 
 document.addEventListener('keydown', function (e) {
 
-    if (e.key === 'Escape') {
+    const searchResults = Array.from(document.querySelectorAll('.search-results__item'));
+
+    if (e.key === "Escape") {
         e.preventDefault();
-        clearSearchResults();
-        searchInput.focus();
+        if (searchResults.length) {
+            clearSearchResults(true);
+            searchInput.focus();
+        } else if (
+            document.activeElement === searchInput
+        ) {
+            clearNoResults();
+            searchInput.blur();
+        }
     }
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -167,7 +240,6 @@ document.addEventListener('keydown', function (e) {
         document.querySelector('.search').scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    const searchResults = Array.from(document.querySelectorAll('.search-results__item'));
     if (!searchResults.length) return;
 
     switch (e.key) {

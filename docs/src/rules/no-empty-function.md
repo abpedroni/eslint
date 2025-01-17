@@ -1,6 +1,5 @@
 ---
 title: no-empty-function
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-empty
@@ -35,17 +34,16 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint no-empty-function: "error"*/
-/*eslint-env es6*/
 
 function foo() {}
 
-var foo = function() {};
+var bar = function() {};
 
-var foo = () => {};
+var bar = () => {};
 
-function* foo() {}
+function* baz() {}
 
-var foo = function*() {};
+var bar = function*() {};
 
 var obj = {
     foo: function() {},
@@ -90,25 +88,24 @@ Examples of **correct** code for this rule:
 
 ```js
 /*eslint no-empty-function: "error"*/
-/*eslint-env es6*/
 
 function foo() {
     // do nothing.
 }
 
-var foo = function() {
+var baz = function() {
     // any clear comments.
 };
 
-var foo = () => {
+var baz = () => {
     bar();
 };
 
-function* foo() {
+function* foobar() {
     // do nothing.
 }
 
-var foo = function*() {
+var baz = function*() {
     // do nothing.
 };
 
@@ -206,7 +203,7 @@ Examples of **correct** code for the `{ "allow": ["functions"] }` option:
 
 function foo() {}
 
-var foo = function() {};
+var bar = function() {};
 
 var obj = {
     foo: function() {}
@@ -223,7 +220,6 @@ Examples of **correct** code for the `{ "allow": ["arrowFunctions"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["arrowFunctions"] }]*/
-/*eslint-env es6*/
 
 var foo = () => {};
 ```
@@ -238,11 +234,10 @@ Examples of **correct** code for the `{ "allow": ["generatorFunctions"] }` optio
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["generatorFunctions"] }]*/
-/*eslint-env es6*/
 
 function* foo() {}
 
-var foo = function*() {};
+var bar = function*() {};
 
 var obj = {
     foo: function*() {}
@@ -259,7 +254,6 @@ Examples of **correct** code for the `{ "allow": ["methods"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["methods"] }]*/
-/*eslint-env es6*/
 
 var obj = {
     foo() {}
@@ -281,7 +275,6 @@ Examples of **correct** code for the `{ "allow": ["generatorMethods"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["generatorMethods"] }]*/
-/*eslint-env es6*/
 
 var obj = {
     *foo() {}
@@ -303,7 +296,6 @@ Examples of **correct** code for the `{ "allow": ["getters"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["getters"] }]*/
-/*eslint-env es6*/
 
 var obj = {
     get foo() {}
@@ -325,7 +317,6 @@ Examples of **correct** code for the `{ "allow": ["setters"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["setters"] }]*/
-/*eslint-env es6*/
 
 var obj = {
     set foo(value) {}
@@ -347,7 +338,6 @@ Examples of **correct** code for the `{ "allow": ["constructors"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["constructors"] }]*/
-/*eslint-env es6*/
 
 class A {
     constructor() {}
@@ -364,7 +354,6 @@ Examples of **correct** code for the `{ "allow": ["asyncFunctions"] }` options:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["asyncFunctions"] }]*/
-/*eslint-env es2017*/
 
 async function a(){}
 ```
@@ -379,7 +368,6 @@ Examples of **correct** code for the `{ "allow": ["asyncMethods"] }` options:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["asyncMethods"] }]*/
-/*eslint-env es2017*/
 
 var obj = {
     async foo() {}

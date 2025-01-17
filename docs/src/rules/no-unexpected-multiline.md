@@ -1,6 +1,5 @@
 ---
 title: no-unexpected-multiline
-layout: doc
 rule_type: problem
 related_rules:
 - func-call-spacing
@@ -32,20 +31,20 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-unexpected-multiline: "error"*/
 
-var foo = bar
+const foo = bar
 (1 || 2).baz();
 
-var hello = 'world'
+const hello = 'world'
 [1, 2, 3].forEach(addNumber);
 
-let x = function() {}
+const x = function() {}
 `hello`
 
-let x = function() {}
-x
+const y = function() {}
+y
 `hello`
 
-let x = foo
+const z = foo
 /regex/g.test(bar)
 ```
 
@@ -58,22 +57,22 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-unexpected-multiline: "error"*/
 
-var foo = bar;
+const foo = bar;
 (1 || 2).baz();
 
-var foo = bar
+const baz = bar
 ;(1 || 2).baz()
 
-var hello = 'world';
+const hello = 'world';
 [1, 2, 3].forEach(addNumber);
 
-var hello = 'world'
+const hi = 'world'
 void [1, 2, 3].forEach(addNumber);
 
-let x = function() {};
+const x = function() {};
 `hello`
 
-let tag = function() {}
+const tag = function() {}
 tag `hello`
 ```
 

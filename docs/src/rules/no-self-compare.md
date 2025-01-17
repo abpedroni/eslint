@@ -1,6 +1,5 @@
 ---
 title: no-self-compare
-layout: doc
 rule_type: problem
 ---
 
@@ -20,7 +19,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-self-compare: "error"*/
 
-var x = 10;
+let x = 10;
 if (x === x) {
     x = 20;
 }

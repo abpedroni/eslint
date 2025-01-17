@@ -1,7 +1,7 @@
 ---
 title: no-setter-return
-layout: doc
 rule_type: problem
+handled_by_typescript: true
 related_rules:
 - getter-return
 further_reading:
@@ -33,7 +33,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-setter-return: "error"*/
 
-var foo = {
+const foo = {
     set a(value) {
         this.val = value;
         return value;
@@ -76,7 +76,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-setter-return: "error"*/
 
-var foo = {
+const foo = {
     set a(value) {
         this.val = value;
     }

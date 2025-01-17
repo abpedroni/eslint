@@ -1,6 +1,5 @@
 ---
 title: no-extra-bind
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
@@ -46,7 +45,6 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint no-extra-bind: "error"*/
-/*eslint-env es6*/
 
 var x = function () {
     foo();
