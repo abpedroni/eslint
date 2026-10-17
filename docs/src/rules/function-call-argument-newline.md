@@ -1,6 +1,5 @@
 ---
 title: function-call-argument-newline
-layout: doc
 rule_type: layout
 related_rules:
 - function-paren-newline
@@ -8,9 +7,6 @@ related_rules:
 - object-property-newline
 - array-element-newline
 ---
-
-
-
 A number of style guides require or disallow line breaks between arguments of a function call.
 
 ## Rule Details

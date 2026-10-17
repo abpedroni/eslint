@@ -1,6 +1,5 @@
 ---
 title: no-negated-condition
-layout: doc
 rule_type: suggestion
 ---
 
@@ -69,3 +68,7 @@ a ? b : c
 ```
 
 :::
+
+## Options
+
+This rule has no options.

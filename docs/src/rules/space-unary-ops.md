@@ -1,11 +1,7 @@
 ---
 title: space-unary-ops
-layout: doc
 rule_type: layout
 ---
-
-
-
 Some style guides require or disallow spaces before or after unary operators. This is mainly a stylistic issue, however, some JavaScript expressions can be written without spacing which makes it harder to read and maintain.
 
 ## Rule Details
@@ -97,7 +93,6 @@ foo --;
 
 ```js
 /*eslint space-unary-ops: "error"*/
-/*eslint-env es6*/
 
 function *foo() {
     yield(0)
@@ -156,7 +151,6 @@ foo--;
 
 ```js
 /*eslint space-unary-ops: "error"*/
-/*eslint-env es6*/
 
 function *foo() {
     yield (0)

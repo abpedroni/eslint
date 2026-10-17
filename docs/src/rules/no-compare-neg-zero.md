@@ -1,6 +1,5 @@
 ---
 title: no-compare-neg-zero
-layout: doc
 rule_type: problem
 ---
 
@@ -49,3 +48,7 @@ if (Object.is(x, -0)) {
 ```
 
 :::
+
+## Options
+
+This rule has no options.

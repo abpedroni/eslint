@@ -1,12 +1,10 @@
 ---
 title: no-new-symbol
-layout: doc
 rule_type: problem
+handled_by_typescript: true
 further_reading:
 - https://www.ecma-international.org/ecma-262/6.0/#sec-symbol-objects
 ---
-
-
 
 `Symbol` is not intended to be used with the `new` operator, but to be called as a function.
 
@@ -20,15 +18,12 @@ This throws a `TypeError` exception.
 
 This rule is aimed at preventing the accidental calling of `Symbol` with the `new` operator.
 
-## Examples
-
 Examples of **incorrect** code for this rule:
 
 ::: incorrect
 
 ```js
 /*eslint no-new-symbol: "error"*/
-/*eslint-env es6*/
 
 var foo = new Symbol('foo');
 ```
@@ -41,7 +36,6 @@ Examples of **correct** code for this rule:
 
 ```js
 /*eslint no-new-symbol: "error"*/
-/*eslint-env es6*/
 
 var foo = Symbol('foo');
 

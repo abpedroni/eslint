@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for options.
+ * @fileoverview Tests for stylish formatter.
  * @author Sindre Sorhus
  */
 
@@ -10,413 +10,734 @@
 //------------------------------------------------------------------------------
 
 const assert = require("chai").assert,
-    chalk = require("chalk"),
-    proxyquire = require("proxyquire"),
-    sinon = require("sinon");
+	util = require("node:util"),
+	sinon = require("sinon"),
+	formatter = require("../../../../lib/cli-engine/formatters/stylish");
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Helpers
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/*
- * Chalk protects its methods so we need to inherit from it
- * for Sinon to work.
- */
-const chalkStub = Object.create(chalk, {
-    reset: {
-        value(str) {
-            return chalk.reset(str);
-        },
-        writable: true
-    },
-    yellow: {
-        value(str) {
-            return chalk.yellow(str);
-        },
-        writable: true
-    },
-    red: {
-        value(str) {
-            return chalk.red(str);
-        },
-        writable: true
-    }
-});
-
-chalkStub.yellow.bold = chalk.yellow.bold;
-chalkStub.red.bold = chalk.red.bold;
-
-const formatter = proxyquire("../../../../lib/cli-engine/formatters/stylish", { chalk: chalkStub });
+// eslint-disable-next-line no-control-regex -- Needed to match ANSI escape code.
+const ansiEscapePattern = /\u001b\[/u;
 
 //------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
 describe("formatter:stylish", () => {
-    const originalColorLevel = chalk.level;
+	beforeEach(() => {
+		sinon.spy(util, "styleText");
+	});
 
-    beforeEach(() => {
-        chalk.level = 0;
-        sinon.spy(chalkStub, "reset");
-        sinon.spy(chalkStub.yellow, "bold");
-        sinon.spy(chalkStub.red, "bold");
-    });
+	afterEach(() => {
+		sinon.verifyAndRestore();
+	});
 
-    afterEach(() => {
-        sinon.verifyAndRestore();
-        chalk.level = originalColorLevel;
-    });
+	describe("when passed `FORCE_COLOR` environment variable", () => {
+		/*
+		 * Note for `FORCE_COLOR`:
+		 * - 2 colors: `FORCE_COLOR = 0` (Disables colors)
+		 * - 16 colors: `FORCE_COLOR = 1`
+		 * - 256 colors: `FORCE_COLOR = 2`
+		 * - 16,777,216 colors: `FORCE_COLOR = 3`
+		 */
 
-    describe("when passed no messages", () => {
-        const code = [{
-            filePath: "foo.js",
-            messages: [],
-            errorCount: 0,
-            warningCount: 0
-        }];
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 0,
+				fixableErrorCount: 0,
+				fixableWarningCount: 0,
+				messages: [
+					{
+						message: "Unexpected foo.",
+						severity: 2,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+		];
 
-        it("should not return message", () => {
-            const result = formatter(code);
+		let hasForceColor = false;
+		let previousForceColor = void 0;
 
-            assert.strictEqual(result, "");
-            assert.strictEqual(chalkStub.reset.callCount, 0);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 0);
-        });
-    });
+		beforeEach(() => {
+			if ("FORCE_COLOR" in process.env) {
+				hasForceColor = true;
+				previousForceColor = process.env.FORCE_COLOR;
+			}
+		});
 
-    describe("when passed a single error message", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 1,
-            warningCount: 0,
-            fixableErrorCount: 0,
-            fixableWarningCount: 0,
-            messages: [{
-                message: "Unexpected foo.",
-                severity: 2,
-                line: 5,
-                column: 10,
-                ruleId: "foo"
-            }]
-        }];
+		afterEach(() => {
+			if (!hasForceColor) {
+				delete process.env.FORCE_COLOR;
+			} else {
+				process.env.FORCE_COLOR = previousForceColor;
+				hasForceColor = false;
+				previousForceColor = void 0;
+			}
+		});
 
-        it("should return a string in the correct format", () => {
-            const result = formatter(code);
+		it("`FORCE_COLOR=0` should disable colors", () => {
+			process.env.FORCE_COLOR = 0;
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  error  Unexpected foo  foo\n\n\u2716 1 problem (1 error, 0 warnings)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
+			const result = formatter(code);
 
-        });
+			assert.notMatch(result, ansiEscapePattern);
+			assert.strictEqual(result, util.stripVTControlCharacters(result));
+		});
 
-        describe("when the error is fixable", () => {
-            beforeEach(() => {
-                code[0].fixableErrorCount = 1;
-            });
+		it("`FORCE_COLOR=1` should enable colors", () => {
+			process.env.FORCE_COLOR = 1;
 
-            it("should return a string in the correct format", () => {
-                const result = formatter(code);
+			const result = formatter(code);
 
-                assert.strictEqual(result, "\nfoo.js\n  5:10  error  Unexpected foo  foo\n\n\u2716 1 problem (1 error, 0 warnings)\n  1 error and 0 warnings potentially fixable with the `--fix` option.\n");
-                assert.strictEqual(chalkStub.reset.callCount, 1);
-                assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-                assert.strictEqual(chalkStub.red.bold.callCount, 2);
-            });
-        });
-    });
+			assert.match(result, ansiEscapePattern);
+			assert.notStrictEqual(
+				result,
+				util.stripVTControlCharacters(result),
+			);
+		});
 
-    describe("when passed a single warning message", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 0,
-            warningCount: 1,
-            fixableErrorCount: 0,
-            fixableWarningCount: 0,
-            messages: [{
-                message: "Unexpected foo.",
-                severity: 1,
-                line: 5,
-                column: 10,
-                ruleId: "foo"
-            }]
-        }];
+		it("`FORCE_COLOR=2` should enable colors", () => {
+			process.env.FORCE_COLOR = 2;
 
-        it("should return a string in the correct format", () => {
-            const result = formatter(code);
+			const result = formatter(code);
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  warning  Unexpected foo  foo\n\n\u2716 1 problem (0 errors, 1 warning)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 1);
-            assert.strictEqual(chalkStub.red.bold.callCount, 0);
-        });
+			assert.match(result, ansiEscapePattern);
+			assert.notStrictEqual(
+				result,
+				util.stripVTControlCharacters(result),
+			);
+		});
 
-        describe("when the error is fixable", () => {
-            beforeEach(() => {
-                code[0].fixableWarningCount = 1;
-            });
+		it("`FORCE_COLOR=3` should enable colors", () => {
+			process.env.FORCE_COLOR = 3;
 
-            it("should return a string in the correct format", () => {
-                const result = formatter(code);
+			const result = formatter(code);
 
-                assert.strictEqual(result, "\nfoo.js\n  5:10  warning  Unexpected foo  foo\n\n\u2716 1 problem (0 errors, 1 warning)\n  0 errors and 1 warning potentially fixable with the `--fix` option.\n");
-                assert.strictEqual(chalkStub.reset.callCount, 1);
-                assert.strictEqual(chalkStub.yellow.bold.callCount, 2);
-                assert.strictEqual(chalkStub.red.bold.callCount, 0);
-            });
+			assert.match(result, ansiEscapePattern);
+			assert.notStrictEqual(
+				result,
+				util.stripVTControlCharacters(result),
+			);
+		});
+	});
 
-        });
-    });
+	describe("when passed `color` option", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 0,
+				fixableErrorCount: 0,
+				fixableWarningCount: 0,
+				messages: [
+					{
+						message: "Unexpected foo.",
+						severity: 2,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+		];
 
-    describe("when passed a message that ends with ' .'", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 0,
-            warningCount: 1,
-            fixableErrorCount: 0,
-            fixableWarningCount: 0,
-            messages: [{
-                message: "Unexpected .",
-                severity: 1,
-                line: 5,
-                column: 10,
-                ruleId: "foo"
-            }]
-        }];
+		let hasForceColor = false;
+		let previousForceColor = void 0;
 
-        it("should return a string in the correct format (retaining the ' .')", () => {
-            const result = formatter(code);
+		beforeEach(() => {
+			if ("FORCE_COLOR" in process.env) {
+				hasForceColor = true;
+				previousForceColor = process.env.FORCE_COLOR;
+			}
+		});
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  warning  Unexpected .  foo\n\n\u2716 1 problem (0 errors, 1 warning)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 1);
-            assert.strictEqual(chalkStub.red.bold.callCount, 0);
-        });
-    });
+		afterEach(() => {
+			if (!hasForceColor) {
+				delete process.env.FORCE_COLOR;
+			} else {
+				process.env.FORCE_COLOR = previousForceColor;
+				hasForceColor = false;
+				previousForceColor = void 0;
+			}
+		});
 
-    describe("when passed a fatal error message", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 1,
-            warningCount: 0,
-            messages: [{
-                fatal: true,
-                message: "Unexpected foo.",
-                line: 5,
-                column: 10,
-                ruleId: "foo"
-            }]
-        }];
+		it("`color: false` should disable colors", () => {
+			const result = formatter(code, { color: false });
 
-        it("should return a string in the correct format", () => {
-            const result = formatter(code);
+			assert.notMatch(result, ansiEscapePattern);
+			assert.strictEqual(result, util.stripVTControlCharacters(result));
+		});
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  error  Unexpected foo  foo\n\n\u2716 1 problem (1 error, 0 warnings)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
-        });
-    });
+		it("`color: false` should ignore environment variable", () => {
+			process.env.FORCE_COLOR = 1;
 
-    describe("when passed multiple messages", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 1,
-            warningCount: 1,
-            messages: [{
-                message: "Unexpected foo.",
-                severity: 2,
-                line: 5,
-                column: 10,
-                ruleId: "foo"
-            }, {
-                message: "Unexpected bar.",
-                severity: 1,
-                line: 6,
-                column: 11,
-                ruleId: "bar"
-            }]
-        }];
+			const result = formatter(code, { color: false });
 
-        it("should return a string with multiple entries", () => {
-            const result = formatter(code);
+			assert.notMatch(result, ansiEscapePattern);
+			assert.strictEqual(result, util.stripVTControlCharacters(result));
+		});
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  error    Unexpected foo  foo\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (1 error, 1 warning)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
-        });
-    });
+		it("`color: true` should enable colors", () => {
+			const result = formatter(code, { color: true });
 
-    describe("when passed multiple files with 1 message each", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 1,
-            warningCount: 0,
-            messages: [{
-                message: "Unexpected foo.",
-                severity: 2,
-                line: 5,
-                column: 10,
-                ruleId: "foo"
-            }]
-        }, {
-            errorCount: 0,
-            warningCount: 1,
-            filePath: "bar.js",
-            messages: [{
-                message: "Unexpected bar.",
-                severity: 1,
-                line: 6,
-                column: 11,
-                ruleId: "bar"
-            }]
-        }];
+			assert.match(result, ansiEscapePattern);
+			assert.notStrictEqual(
+				result,
+				util.stripVTControlCharacters(result),
+			);
+		});
 
-        it("should return a string with multiple entries", () => {
-            const result = formatter(code);
+		it("`color: true` should ignore environment variable", () => {
+			process.env.FORCE_COLOR = 0;
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  error  Unexpected foo  foo\n\nbar.js\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (1 error, 1 warning)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
-        });
+			const result = formatter(code, { color: true });
 
-        it("should add errorCount", () => {
-            code.forEach(c => {
-                c.errorCount = 1;
-                c.warningCount = 0;
-            });
+			assert.match(result, ansiEscapePattern);
+			assert.notStrictEqual(
+				result,
+				util.stripVTControlCharacters(result),
+			);
+		});
+	});
 
-            const result = formatter(code);
+	describe("when a message contains VT control characters", () => {
+		/**
+		 * Builds a result whose message contains the given text, alongside a
+		 * second row that determines the column width.
+		 * @param {string} message The message text to use.
+		 * @returns {Object[]} The lint results.
+		 */
+		function resultsWithMessage(message) {
+			return [
+				{
+					filePath: "foo.js",
+					errorCount: 2,
+					warningCount: 0,
+					fixableErrorCount: 0,
+					fixableWarningCount: 0,
+					messages: [
+						{
+							message,
+							severity: 2,
+							line: 5,
+							column: 10,
+							ruleId: "foo",
+						},
+						{
+							message: "Second message",
+							severity: 2,
+							line: 6,
+							column: 11,
+							ruleId: "bar",
+						},
+					],
+				},
+			];
+		}
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  error  Unexpected foo  foo\n\nbar.js\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (2 errors, 0 warnings)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
-        });
+		it("should align columns when a message contains an 8-bit CSI introducer", () => {
+			// \u009b is the 8-bit CSI introducer, which `stripVTControlCharacters()` removes.
+			const csiMessage = `\u009b31mred\u009b0m`;
+			const result = util.stripVTControlCharacters(
+				formatter(resultsWithMessage(csiMessage)),
+			);
 
-        it("should add warningCount", () => {
-            code.forEach(c => {
-                c.errorCount = 0;
-                c.warningCount = 1;
-            });
+			/*
+			 * The visible width of the CSI message is "red" (3 characters), which
+			 * is shorter than "Second message", so the rule ID column must line up
+			 * across both rows.
+			 */
+			const lines = result
+				.split("\n")
+				.filter(line => /^\s+\d+:\d+\s/u.test(line));
 
-            const result = formatter(code);
+			assert.lengthOf(lines, 2);
+			assert.strictEqual(
+				lines[0].indexOf("foo"),
+				lines[1].indexOf("bar"),
+				"Rule ID columns should be aligned",
+			);
+		});
+	});
 
-            assert.strictEqual(result, "\nfoo.js\n  5:10  error  Unexpected foo  foo\n\nbar.js\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (0 errors, 2 warnings)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
-        });
-    });
+	describe("when passed no messages", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				messages: [],
+				errorCount: 0,
+				warningCount: 0,
+			},
+		];
 
-    describe("when passed one file not found message", () => {
-        const code = [{
-            filePath: "foo.js",
-            errorCount: 1,
-            warningCount: 0,
-            messages: [{
-                fatal: true,
-                message: "Couldn't find foo.js."
-            }]
-        }];
+		it("should not return message", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
 
-        it("should return a string without line and column", () => {
-            const result = formatter(code);
+			assert.strictEqual(result, "");
+			assert.strictEqual(util.styleText.callCount, 0);
+		});
+	});
 
-            assert.strictEqual(result, "\nfoo.js\n  0:0  error  Couldn't find foo.js\n\n\u2716 1 problem (1 error, 0 warnings)\n");
-            assert.strictEqual(chalkStub.reset.callCount, 1);
-            assert.strictEqual(chalkStub.yellow.bold.callCount, 0);
-            assert.strictEqual(chalkStub.red.bold.callCount, 1);
-        });
-    });
+	describe("when passed a single error message", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 0,
+				fixableErrorCount: 0,
+				fixableWarningCount: 0,
+				messages: [
+					{
+						message: "Unexpected foo.",
+						severity: 2,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+		];
 
-    describe("fixable problems", () => {
-        it("should not output fixable problems message when no errors or warnings are fixable", () => {
-            const code = [{
-                filePath: "foo.js",
-                errorCount: 1,
-                warningCount: 0,
-                fixableErrorCount: 0,
-                fixableWarningCount: 0,
-                messages: [{
-                    message: "Unexpected foo.",
-                    severity: 2,
-                    line: 5,
-                    column: 10,
-                    ruleId: "foo"
-                }]
-            }];
+		it("should return a string in the correct format", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 1 problem (1 error, 0 warnings)";
 
-            const result = formatter(code);
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  error  Unexpected foo  foo\n\n\u2716 1 problem (1 error, 0 warnings)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
 
-            assert.notInclude(result, "potentially fixable");
-        });
+		describe("when the error is fixable", () => {
+			beforeEach(() => {
+				code[0].fixableErrorCount = 1;
+			});
 
-        it("should output the fixable problems message when errors are fixable", () => {
-            const code = [{
-                filePath: "foo.js",
-                errorCount: 1,
-                warningCount: 0,
-                fixableErrorCount: 1,
-                fixableWarningCount: 0,
-                messages: [{
-                    message: "Unexpected foo.",
-                    severity: 2,
-                    line: 5,
-                    column: 10,
-                    ruleId: "foo"
-                }]
-            }];
+			it("should return a string in the correct format", () => {
+				const result = util.stripVTControlCharacters(formatter(code));
+				const summary = "\u2716 1 problem (1 error, 0 warnings)";
 
-            const result = formatter(code);
+				assert.strictEqual(
+					result,
+					"\nfoo.js\n  5:10  error  Unexpected foo  foo\n\n\u2716 1 problem (1 error, 0 warnings)\n  1 error and 0 warnings potentially fixable with the `--fix` option.\n",
+				);
+				assert(util.styleText.calledWith("reset"));
+				assert(util.styleText.neverCalledWithMatch("yellow", summary));
+				assert(util.styleText.calledWith("bold", summary));
+				assert(util.styleText.calledWithMatch("red", summary));
+				assert(util.styleText.getCall(4).calledWith("bold"));
+				assert(util.styleText.getCall(5).calledWith("red"));
+				assert(util.styleText.getCall(6).calledWith("bold"));
+				assert(util.styleText.getCall(7).calledWith("red"));
+			});
+		});
+	});
 
-            assert.include(result, "  1 error and 0 warnings potentially fixable with the `--fix` option.\n");
-        });
+	describe("when passed a single warning message", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 0,
+				warningCount: 1,
+				fixableErrorCount: 0,
+				fixableWarningCount: 0,
+				messages: [
+					{
+						message: "Unexpected foo.",
+						severity: 1,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+		];
 
-        it("should output fixable problems message when warnings are fixable", () => {
-            const code = [{
-                filePath: "foo.js",
-                errorCount: 0,
-                warningCount: 3,
-                fixableErrorCount: 0,
-                fixableWarningCount: 2,
-                messages: [{
-                    message: "Unexpected foo."
-                }]
-            }];
+		it("should return a string in the correct format", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 1 problem (0 errors, 1 warning)";
 
-            const result = formatter(code);
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  warning  Unexpected foo  foo\n\n\u2716 1 problem (0 errors, 1 warning)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("yellow", summary));
+			assert(util.styleText.neverCalledWithMatch("red", summary));
+		});
 
-            assert.include(result, "  0 errors and 2 warnings potentially fixable with the `--fix` option.\n");
-        });
+		describe("when the error is fixable", () => {
+			beforeEach(() => {
+				code[0].fixableWarningCount = 1;
+			});
 
-        it("should output the total number of fixable errors and warnings", () => {
-            const code = [{
-                filePath: "foo.js",
-                errorCount: 5,
-                warningCount: 3,
-                fixableErrorCount: 5,
-                fixableWarningCount: 2,
-                messages: [{
-                    message: "Unexpected foo."
-                }]
-            }, {
-                filePath: "bar.js",
-                errorCount: 4,
-                warningCount: 2,
-                fixableErrorCount: 4,
-                fixableWarningCount: 1,
-                messages: [{
-                    message: "Unexpected bar."
-                }]
-            }];
+			it("should return a string in the correct format", () => {
+				const result = util.stripVTControlCharacters(formatter(code));
+				const summary = "\u2716 1 problem (0 errors, 1 warning)";
 
-            const result = formatter(code);
+				assert.strictEqual(
+					result,
+					"\nfoo.js\n  5:10  warning  Unexpected foo  foo\n\n\u2716 1 problem (0 errors, 1 warning)\n  0 errors and 1 warning potentially fixable with the `--fix` option.\n",
+				);
+				assert(util.styleText.calledWith("reset"));
+				assert(util.styleText.calledWith("bold", summary));
+				assert(util.styleText.calledWithMatch("yellow", summary));
+				assert(util.styleText.neverCalledWithMatch("red", summary));
+				assert(util.styleText.getCall(4).calledWith("bold"));
+				assert(util.styleText.getCall(5).calledWith("yellow"));
+				assert(util.styleText.getCall(6).calledWith("bold"));
+				assert(util.styleText.getCall(7).calledWith("yellow"));
+			});
+		});
+	});
 
-            assert.include(result, "  9 errors and 3 warnings potentially fixable with the `--fix` option.\n");
-        });
-    });
+	describe("when passed a message that ends with ' .'", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 0,
+				warningCount: 1,
+				fixableErrorCount: 0,
+				fixableWarningCount: 0,
+				messages: [
+					{
+						message: "Unexpected .",
+						severity: 1,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+		];
+
+		it("should return a string in the correct format (retaining the ' .')", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 1 problem (0 errors, 1 warning)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  warning  Unexpected .  foo\n\n\u2716 1 problem (0 errors, 1 warning)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("yellow", summary));
+			assert(util.styleText.neverCalledWithMatch("red", summary));
+		});
+	});
+
+	describe("when passed a fatal error message", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 0,
+				messages: [
+					{
+						fatal: true,
+						message: "Unexpected foo.",
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+		];
+
+		it("should return a string in the correct format", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 1 problem (1 error, 0 warnings)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  error  Unexpected foo  foo\n\n\u2716 1 problem (1 error, 0 warnings)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
+	});
+
+	describe("when passed multiple messages", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 1,
+				messages: [
+					{
+						message: "Unexpected foo.",
+						severity: 2,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+					{
+						message: "Unexpected bar.",
+						severity: 1,
+						line: 6,
+						column: 11,
+						ruleId: "bar",
+					},
+				],
+			},
+		];
+
+		it("should return a string with multiple entries", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 2 problems (1 error, 1 warning)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  error    Unexpected foo  foo\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (1 error, 1 warning)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
+	});
+
+	describe("when passed multiple files with 1 message each", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 0,
+				messages: [
+					{
+						message: "Unexpected foo.",
+						severity: 2,
+						line: 5,
+						column: 10,
+						ruleId: "foo",
+					},
+				],
+			},
+			{
+				errorCount: 0,
+				warningCount: 1,
+				filePath: "bar.js",
+				messages: [
+					{
+						message: "Unexpected bar.",
+						severity: 1,
+						line: 6,
+						column: 11,
+						ruleId: "bar",
+					},
+				],
+			},
+		];
+
+		it("should return a string with multiple entries", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 2 problems (1 error, 1 warning)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  error  Unexpected foo  foo\n\nbar.js\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (1 error, 1 warning)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
+
+		it("should add errorCount", () => {
+			code.forEach(c => {
+				c.errorCount = 1;
+				c.warningCount = 0;
+			});
+
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 2 problems (2 errors, 0 warnings)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  error  Unexpected foo  foo\n\nbar.js\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (2 errors, 0 warnings)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
+
+		it("should add warningCount", () => {
+			code.forEach(c => {
+				c.errorCount = 0;
+				c.warningCount = 1;
+			});
+
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 2 problems (0 errors, 2 warnings)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  5:10  error  Unexpected foo  foo\n\nbar.js\n  6:11  warning  Unexpected bar  bar\n\n\u2716 2 problems (0 errors, 2 warnings)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
+	});
+
+	describe("when passed one file not found message", () => {
+		const code = [
+			{
+				filePath: "foo.js",
+				errorCount: 1,
+				warningCount: 0,
+				messages: [
+					{
+						fatal: true,
+						message: "Couldn't find foo.js.",
+					},
+				],
+			},
+		];
+
+		it("should return a string without line and column", () => {
+			const result = util.stripVTControlCharacters(formatter(code));
+			const summary = "\u2716 1 problem (1 error, 0 warnings)";
+
+			assert.strictEqual(
+				result,
+				"\nfoo.js\n  0:0  error  Couldn't find foo.js\n\n\u2716 1 problem (1 error, 0 warnings)\n",
+			);
+			assert(util.styleText.calledWith("reset"));
+			assert(util.styleText.neverCalledWithMatch("yellow", summary));
+			assert(util.styleText.calledWith("bold", summary));
+			assert(util.styleText.calledWithMatch("red", summary));
+		});
+	});
+
+	describe("fixable problems", () => {
+		it("should not output fixable problems message when no errors or warnings are fixable", () => {
+			const code = [
+				{
+					filePath: "foo.js",
+					errorCount: 1,
+					warningCount: 0,
+					fixableErrorCount: 0,
+					fixableWarningCount: 0,
+					messages: [
+						{
+							message: "Unexpected foo.",
+							severity: 2,
+							line: 5,
+							column: 10,
+							ruleId: "foo",
+						},
+					],
+				},
+			];
+
+			const result = util.stripVTControlCharacters(formatter(code));
+
+			assert.notInclude(result, "potentially fixable");
+		});
+
+		it("should output the fixable problems message when errors are fixable", () => {
+			const code = [
+				{
+					filePath: "foo.js",
+					errorCount: 1,
+					warningCount: 0,
+					fixableErrorCount: 1,
+					fixableWarningCount: 0,
+					messages: [
+						{
+							message: "Unexpected foo.",
+							severity: 2,
+							line: 5,
+							column: 10,
+							ruleId: "foo",
+						},
+					],
+				},
+			];
+
+			const result = util.stripVTControlCharacters(formatter(code));
+
+			assert.include(
+				result,
+				"  1 error and 0 warnings potentially fixable with the `--fix` option.\n",
+			);
+		});
+
+		it("should output fixable problems message when warnings are fixable", () => {
+			const code = [
+				{
+					filePath: "foo.js",
+					errorCount: 0,
+					warningCount: 3,
+					fixableErrorCount: 0,
+					fixableWarningCount: 2,
+					messages: [
+						{
+							message: "Unexpected foo.",
+						},
+					],
+				},
+			];
+
+			const result = util.stripVTControlCharacters(formatter(code));
+
+			assert.include(
+				result,
+				"  0 errors and 2 warnings potentially fixable with the `--fix` option.\n",
+			);
+		});
+
+		it("should output the total number of fixable errors and warnings", () => {
+			const code = [
+				{
+					filePath: "foo.js",
+					errorCount: 5,
+					warningCount: 3,
+					fixableErrorCount: 5,
+					fixableWarningCount: 2,
+					messages: [
+						{
+							message: "Unexpected foo.",
+						},
+					],
+				},
+				{
+					filePath: "bar.js",
+					errorCount: 4,
+					warningCount: 2,
+					fixableErrorCount: 4,
+					fixableWarningCount: 1,
+					messages: [
+						{
+							message: "Unexpected bar.",
+						},
+					],
+				},
+			];
+
+			const result = util.stripVTControlCharacters(formatter(code));
+
+			assert.include(
+				result,
+				"  9 errors and 3 warnings potentially fixable with the `--fix` option.\n",
+			);
+		});
+	});
 });

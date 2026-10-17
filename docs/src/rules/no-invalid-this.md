@@ -1,7 +1,8 @@
 ---
 title: no-invalid-this
-layout: doc
 rule_type: suggestion
+handled_by_typescript: true
+extra_typescript_info: Note that, technically, TypeScript will only catch this if you have the `strict` or `noImplicitThis` flags enabled. These are enabled in most TypeScript projects, since they are considered to be best practice.
 ---
 
 
@@ -44,15 +45,14 @@ And this rule always allows `this` keywords in the following contexts:
 Otherwise are considered problems.
 
 This rule applies **only** in strict mode.
-With `"parserOptions": { "sourceType": "module" }` in the ESLint configuration, your code is in strict mode even without a `"use strict"` directive.
+With `"languageOptions": { "sourceType": "module" }` in the ESLint configuration, your code is in strict mode even without a `"use strict"` directive.
 
 Examples of **incorrect** code for this rule in strict mode:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-invalid-this: "error"*/
-/*eslint-env es6*/
 
 "use strict";
 
@@ -66,7 +66,7 @@ function foo() {
     baz(() => this);
 }
 
-var foo = function() {
+const bar = function() {
     this.a = 0;
     baz(() => this);
 };
@@ -76,7 +76,7 @@ foo(function() {
     baz(() => this);
 });
 
-var obj = {
+const obj = {
     aaa: function() {
         return function foo() {
             // There is in a method `aaa`, but `foo` is not a method.
@@ -96,11 +96,10 @@ foo.forEach(function() {
 
 Examples of **correct** code for this rule in strict mode:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-invalid-this: "error"*/
-/*eslint-env es6*/
 
 "use strict";
 
@@ -113,7 +112,7 @@ function Foo() {
     baz(() => this);
 }
 
-class Foo {
+class Bar {
     constructor() {
         // OK, this is in a constructor.
         this.a = 0;
@@ -121,28 +120,28 @@ class Foo {
     }
 }
 
-var obj = {
+const obj = {
     foo: function foo() {
         // OK, this is in a method (this function is on object literal).
         this.a = 0;
     }
 };
 
-var obj = {
+const obj1 = {
     foo() {
         // OK, this is in a method (this function is on object literal).
         this.a = 0;
     }
 };
 
-var obj = {
+const obj2 = {
     get foo() {
         // OK, this is in a method (this function is on object literal).
         return this.a;
     }
 };
 
-var obj = Object.create(null, {
+const obj3 = Object.create(null, {
     foo: {value: function foo() {
         // OK, this is in a method (this function is on object literal).
         this.a = 0;
@@ -181,7 +180,7 @@ Foo.prototype.foo = function foo() {
     this.a = 0;
 };
 
-class Foo {
+class Baz {
 
     // OK, this is in a class field initializer.
     a = this.b;
@@ -208,7 +207,7 @@ class Foo {
     }
 }
 
-var foo = (function foo() {
+const bar = (function foo() {
     // OK, the `bind` method of this function is called directly.
     this.a = 0;
 }).bind(obj);
@@ -242,7 +241,7 @@ Set `"capIsConstructor"` to `false` if you want those functions to be treated as
 
 Examples of **incorrect** code for this rule with `"capIsConstructor"` option set to `false`:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-invalid-this: ["error", { "capIsConstructor": false }]*/
@@ -253,11 +252,11 @@ function Foo() {
     this.a = 0;
 }
 
-var bar = function Foo() {
+const bar = function Foo() {
     this.a = 0;
 }
 
-var Bar = function() {
+const Bar = function() {
     this.a = 0;
 };
 
@@ -270,7 +269,7 @@ Baz = function() {
 
 Examples of **correct** code for this rule with `"capIsConstructor"` option set to `false`:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-invalid-this: ["error", { "capIsConstructor": false }]*/
@@ -281,6 +280,59 @@ obj.Foo = function Foo() {
     // OK, this is in a method.
     this.a = 0;
 };
+```
+
+:::
+
+This rule additionally supports TypeScript type syntax.
+
+Examples of **incorrect** TypeScript code for this rule:
+
+:::incorrect
+
+```ts
+/*eslint no-invalid-this: "error"*/
+
+function foo(bar: string) {
+    this.prop;
+    console.log(bar)
+}
+
+/** @this Obj */
+foo(function() {
+    console.log(this);
+    z(x => console.log(x, this));
+});
+
+function foo() {
+  class C {
+    accessor [this.a] = foo;
+  }
+}
+```
+
+:::
+
+Examples of **correct** TypeScript code for this rule:
+
+:::correct
+
+```ts
+/*eslint no-invalid-this: "error"*/
+
+interface SomeType {
+    prop: string;
+}
+
+function foo(this: SomeType) {
+    this.prop;
+}
+
+class A {
+    a = 5;
+    b = this.a;
+    accessor c = this.a;
+}
 ```
 
 :::

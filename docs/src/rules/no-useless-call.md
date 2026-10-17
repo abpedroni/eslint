@@ -1,6 +1,5 @@
 ---
 title: no-useless-call
-layout: doc
 rule_type: suggestion
 related_rules:
 - prefer-spread
@@ -57,6 +56,10 @@ obj.foo.apply(obj, args);
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## Known Limitations
 

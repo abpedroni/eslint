@@ -1,8 +1,8 @@
 ---
 title: radix
-layout: doc
 rule_type: suggestion
 further_reading:
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt
 - https://davidwalsh.name/parseint-radix
 ---
 
@@ -13,102 +13,61 @@ When using the `parseInt()` function it is common to omit the second argument, t
 This confusion led to the suggestion that you always use the radix parameter to `parseInt()` to eliminate unintended consequences. So instead of doing this:
 
 ```js
-var num = parseInt("071");      // 57
+const num = parseInt("071");      // 57
 ```
 
 Do this:
 
 ```js
-var num = parseInt("071", 10);  // 71
+const num = parseInt("071", 10);  // 71
 ```
 
 ECMAScript 5 changed the behavior of `parseInt()` so that it no longer autodetects octal literals and instead treats them as decimal literals. However, the differences between hexadecimal and decimal interpretation of the first parameter causes many developers to continue using the radix parameter to ensure the string is interpreted in the intended way.
 
-On the other hand, if the code is targeting only ES5-compliant environments passing the radix `10` may be redundant. In such a case you might want to disallow using such a radix.
-
 ## Rule Details
 
-This rule is aimed at preventing the unintended conversion of a string to a number of a different base than intended or at preventing the redundant `10` radix if targeting modern environments only.
+This rule is aimed at preventing the unintended conversion of a string to a number of a different base than intended.
+
+Examples of **incorrect** code for this rule:
+
+::: incorrect
+
+```js
+/*eslint radix: "error"*/
+
+const num = parseInt("071");
+
+const num1 = parseInt(someValue);
+
+const num2 = parseInt("071", "abc");
+
+const num3 = parseInt("071", 37);
+
+const num4 = parseInt();
+```
+
+:::
+
+Examples of **correct** code for this rule:
+
+::: correct
+
+```js
+/*eslint radix: "error"*/
+
+const num = parseInt("071", 10);
+
+const num1 = parseInt("071", 8);
+
+const num2 = parseFloat(someValue);
+```
+
+:::
 
 ## Options
 
-There are two options for this rule:
-
-* `"always"` enforces providing a radix (default)
-* `"as-needed"` disallows providing the `10` radix
-
-### always
-
-Examples of **incorrect** code for the default `"always"` option:
-
-::: incorrect
-
-```js
-/*eslint radix: "error"*/
-
-var num = parseInt("071");
-
-var num = parseInt(someValue);
-
-var num = parseInt("071", "abc");
-
-var num = parseInt("071", 37);
-
-var num = parseInt();
-```
-
-:::
-
-Examples of **correct** code for the default `"always"` option:
-
-::: correct
-
-```js
-/*eslint radix: "error"*/
-
-var num = parseInt("071", 10);
-
-var num = parseInt("071", 8);
-
-var num = parseFloat(someValue);
-```
-
-:::
-
-### as-needed
-
-Examples of **incorrect** code for the `"as-needed"` option:
-
-::: incorrect
-
-```js
-/*eslint radix: ["error", "as-needed"]*/
-
-var num = parseInt("071", 10);
-
-var num = parseInt("071", "abc");
-
-var num = parseInt();
-```
-
-:::
-
-Examples of **correct** code for the `"as-needed"` option:
-
-::: correct
-
-```js
-/*eslint radix: ["error", "as-needed"]*/
-
-var num = parseInt("071");
-
-var num = parseInt("071", 8);
-
-var num = parseFloat(someValue);
-```
-
-:::
+**Deprecated:** String options `"always"` and `"as-needed"` are deprecated. Setting either of these options doesn't change the behavior of this rule, which now always enforces providing a radix, as it was the case when the `"always"` option was specified. Since the default radix depends on the first argument of `parseInt()`, this rule assumes that the second argument (the radix) is always needed.
 
 ## When Not To Use It
 
-If you don't want to enforce either presence or omission of the `10` radix value you can turn this rule off.
+If you want to use the default behavior of the `parseInt()` function when the radix argument is not specified, you can turn this rule off.

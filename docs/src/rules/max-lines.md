@@ -1,6 +1,5 @@
 ---
 title: max-lines
-layout: doc
 rule_type: suggestion
 related_rules:
 - complexity
@@ -26,21 +25,21 @@ Please note that most editors show an additional empty line at the end if the fi
 
 This rule has a number or object option:
 
-* `"max"` (default `300`) enforces a maximum number of lines in a file
+* `"max"` (default `300`) enforces a maximum number of lines in a file.
 
 * `"skipBlankLines": true` ignore lines made up purely of whitespace.
 
-* `"skipComments": true` ignore lines containing just comments
+* `"skipComments": true` ignore lines containing just comments.
 
 ### max
 
-Examples of **incorrect** code for this rule with a max value of `2`:
+Examples of **incorrect** code for this rule with a max value of `3`:
 
 ::: incorrect
 
 ```js
-/*eslint max-lines: ["error", 2]*/
-var a,
+/*eslint max-lines: ["error", 3]*/
+let a,
     b,
     c;
 ```
@@ -50,9 +49,9 @@ var a,
 ::: incorrect
 
 ```js
-/*eslint max-lines: ["error", 2]*/
+/*eslint max-lines: ["error", 3]*/
 
-var a,
+let a,
     b,c;
 ```
 
@@ -61,21 +60,21 @@ var a,
 ::: incorrect
 
 ```js
-/*eslint max-lines: ["error", 2]*/
+/*eslint max-lines: ["error", 3]*/
 // a comment
-var a,
+let a,
     b,c;
 ```
 
 :::
 
-Examples of **correct** code for this rule with a max value of `2`:
+Examples of **correct** code for this rule with a max value of `3`:
 
 ::: correct
 
 ```js
-/*eslint max-lines: ["error", 2]*/
-var a,
+/*eslint max-lines: ["error", 3]*/
+let a,
     b, c;
 ```
 
@@ -84,9 +83,9 @@ var a,
 ::: correct
 
 ```js
-/*eslint max-lines: ["error", 2]*/
+/*eslint max-lines: ["error", 3]*/
 
-var a, b, c;
+let a, b, c;
 ```
 
 :::
@@ -94,9 +93,9 @@ var a, b, c;
 ::: correct
 
 ```js
-/*eslint max-lines: ["error", 2]*/
+/*eslint max-lines: ["error", 3]*/
 // a comment
-var a, b, c;
+let a, b, c;
 ```
 
 :::
@@ -108,9 +107,9 @@ Examples of **incorrect** code for this rule with the `{ "skipBlankLines": true 
 ::: incorrect
 
 ```js
-/*eslint max-lines: ["error", {"max": 2, "skipBlankLines": true}]*/
+/*eslint max-lines: ["error", {"max": 3, "skipBlankLines": true}]*/
 
-var a,
+let a,
     b,
     c;
 ```
@@ -122,9 +121,9 @@ Examples of **correct** code for this rule with the `{ "skipBlankLines": true }`
 ::: correct
 
 ```js
-/*eslint max-lines: ["error", {"max": 2, "skipBlankLines": true}]*/
+/*eslint max-lines: ["error", {"max": 3, "skipBlankLines": true}]*/
 
-var a,
+let a,
     b, c;
 ```
 
@@ -139,7 +138,7 @@ Examples of **incorrect** code for this rule with the `{ "skipComments": true }`
 ```js
 /*eslint max-lines: ["error", {"max": 2, "skipComments": true}]*/
 // a comment
-var a,
+let a,
     b,
     c;
 ```
@@ -153,7 +152,7 @@ Examples of **correct** code for this rule with the `{ "skipComments": true }` o
 ```js
 /*eslint max-lines: ["error", {"max": 2, "skipComments": true}]*/
 // a comment
-var a,
+let a,
     b, c;
 ```
 

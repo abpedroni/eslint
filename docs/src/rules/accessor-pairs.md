@@ -1,6 +1,5 @@
 ---
 title: accessor-pairs
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-dupe-keys
@@ -18,7 +17,7 @@ Here are some examples:
 
 ```js
 // Bad
-var o = {
+const o = {
     set a(value) {
         this.val = value;
     }
@@ -26,7 +25,7 @@ var o = {
 
 
 // Good
-var o = {
+const p = {
     set a(value) {
         this.val = value;
     },
@@ -52,6 +51,7 @@ This rule always checks object literals and property descriptors. By default, it
 * `setWithoutGet` set to `true` will warn for setters without getters (Default `true`).
 * `getWithoutSet` set to `true` will warn for getters without setters (Default `false`).
 * `enforceForClassMembers` set to `true` additionally applies this rule to class getters/setters (Default `true`). Set `enforceForClassMembers` to `false` if you want this rule to ignore class declarations and class expressions.
+* `enforceForTSTypes`: set to `true` additionally applies this rule to TypeScript type definitions (Default `false`).
 
 ### setWithoutGet
 
@@ -62,15 +62,15 @@ Examples of **incorrect** code for the default `{ "setWithoutGet": true }` optio
 ```js
 /*eslint accessor-pairs: "error"*/
 
-var o = {
+const q = {
     set a(value) {
         this.val = value;
     }
 };
 
 
-var o = {d: 1};
-Object.defineProperty(o, 'c', {
+const r = {d: 1};
+Object.defineProperty(r, 'c', {
     set: function(value) {
         this.val = value;
     }
@@ -86,7 +86,7 @@ Examples of **correct** code for the default `{ "setWithoutGet": true }` option:
 ```js
 /*eslint accessor-pairs: "error"*/
 
-var o = {
+const s = {
     set a(value) {
         this.val = value;
     },
@@ -95,8 +95,8 @@ var o = {
     }
 };
 
-var o = {d: 1};
-Object.defineProperty(o, 'c', {
+const t = {d: 1};
+Object.defineProperty(t, 'c', {
     set: function(value) {
         this.val = value;
     },
@@ -118,27 +118,27 @@ Examples of **incorrect** code for the `{ "getWithoutSet": true }` option:
 ```js
 /*eslint accessor-pairs: ["error", { "getWithoutSet": true }]*/
 
-var o = {
+const u = {
     set a(value) {
         this.val = value;
     }
 };
 
-var o = {
+const v = {
     get a() {
         return this.val;
     }
 };
 
-var o = {d: 1};
-Object.defineProperty(o, 'c', {
+const w = {d: 1};
+Object.defineProperty(w, 'c', {
     set: function(value) {
         this.val = value;
     }
 });
 
-var o = {d: 1};
-Object.defineProperty(o, 'c', {
+const x = {d: 1};
+Object.defineProperty(x, 'c', {
     get: function() {
         return this.val;
     }
@@ -153,7 +153,7 @@ Examples of **correct** code for the `{ "getWithoutSet": true }` option:
 
 ```js
 /*eslint accessor-pairs: ["error", { "getWithoutSet": true }]*/
-var o = {
+const y = {
     set a(value) {
         this.val = value;
     },
@@ -162,8 +162,8 @@ var o = {
     }
 };
 
-var o = {d: 1};
-Object.defineProperty(o, 'c', {
+const z = {d: 1};
+Object.defineProperty(z, 'c', {
     set: function(value) {
         this.val = value;
     },
@@ -274,6 +274,71 @@ const Quux = class {
 
 :::
 
+### enforceForTSTypes
+
+When `enforceForTSTypes` is set to `true`:
+
+* `"getWithoutSet": true` will also warn for getters without setters in TypeScript types.
+* `"setWithoutGet": true` will also warn for setters without getters in TypeScript types.
+
+Examples of **incorrect** code for `{ "getWithoutSet": true, "enforceForTSTypes": true }`:
+
+:::incorrect
+
+```ts
+/*eslint accessor-pairs: ["error", { "getWithoutSet": true, "enforceForTSTypes": true }]*/
+
+interface I {
+    get a(): string
+}
+
+type T = {
+    get a(): number
+}
+```
+
+:::
+
+Examples of **incorrect** code for `{ "setWithoutGet": true, "enforceForTSTypes": true }`:
+
+:::incorrect
+
+```ts
+/*eslint accessor-pairs: ["error", { "setWithoutGet": true, "enforceForTSTypes": true }]*/
+
+interface I {
+    set a(value: unknown): void
+}
+
+type T = {
+    set a(value: unknown): void
+}
+```
+
+:::
+
+When `enforceForTSTypes` is set to `false`, this rule ignores TypeScript types.
+
+Examples of **correct** code for `{ "getWithoutSet": true, "setWithoutGet": true, "enforceForTSTypes": false }`:
+
+:::correct
+
+```ts
+/*eslint accessor-pairs: ["error", {
+    "getWithoutSet": true, "setWithoutGet": true, "enforceForTSTypes": false
+}]*/
+
+interface I {
+    get a(): string
+}
+
+type T = {
+    set a(value: unknown): void
+}
+```
+
+:::
+
 ## Known Limitations
 
 Due to the limits of static analysis, this rule does not account for possible side effects and in certain cases
@@ -282,14 +347,14 @@ might not report a missing pair for a getter/setter that has a computed key, lik
 ```js
 /*eslint accessor-pairs: "error"*/
 
-var a = 1;
+const z = 1;
 
 // no warnings
-var o = {
-    get [a++]() {
+const a = {
+    get [z++]() {
         return this.val;
     },
-    set [a++](value) {
+    set [z++](value) {
         this.val = value;
     }
 };
@@ -302,7 +367,7 @@ might not report a missing pair for a getter/setter, like in the following examp
 /*eslint accessor-pairs: "error"*/
 
 // no warnings
-var o = {
+const b = {
     get a() {
         return this.val;
     },

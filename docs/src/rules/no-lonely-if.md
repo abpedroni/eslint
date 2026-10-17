@@ -1,6 +1,5 @@
 ---
 title: no-lonely-if
-layout: doc
 rule_type: suggestion
 ---
 
@@ -92,6 +91,10 @@ if (condition) {
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

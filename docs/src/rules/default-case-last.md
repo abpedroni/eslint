@@ -1,6 +1,5 @@
 ---
 title: default-case-last
-layout: doc
 rule_type: suggestion
 related_rules:
 - default-case
@@ -132,3 +131,8 @@ doSomethingAnyway();
 ```
 
 :::
+
+## Options
+
+This rule has no options.
+

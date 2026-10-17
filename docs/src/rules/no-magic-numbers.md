@@ -1,6 +1,5 @@
 ---
 title: no-magic-numbers
-layout: doc
 rule_type: suggestion
 ---
 
@@ -9,7 +8,7 @@ rule_type: suggestion
 They should preferably be replaced by named constants.
 
 ```js
-var now = Date.now(),
+const now = Date.now(),
     inOneHour = now + (60 * 60 * 1000);
 ```
 
@@ -25,7 +24,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-magic-numbers: "error"*/
 
-var dutyFreePrice = 100,
+const dutyFreePrice = 100,
     finalPrice = dutyFreePrice + (dutyFreePrice * 0.25);
 ```
 
@@ -36,9 +35,9 @@ var dutyFreePrice = 100,
 ```js
 /*eslint no-magic-numbers: "error"*/
 
-var data = ['foo', 'bar', 'baz'];
+const data = ['foo', 'bar', 'baz'];
 
-var dataLast = data[2];
+const dataLast = data[2];
 ```
 
 :::
@@ -48,7 +47,7 @@ var dataLast = data[2];
 ```js
 /*eslint no-magic-numbers: "error"*/
 
-var SECONDS;
+let SECONDS;
 
 SECONDS = 60;
 ```
@@ -62,9 +61,9 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-magic-numbers: "error"*/
 
-var TAX = 0.25;
+const TAX = 0.25;
 
-var dutyFreePrice = 100,
+const dutyFreePrice = 100,
     finalPrice = dutyFreePrice + (dutyFreePrice * TAX);
 ```
 
@@ -87,8 +86,8 @@ Examples of **correct** code for the sample `{ "ignore": [1] }` option:
 ```js
 /*eslint no-magic-numbers: ["error", { "ignore": [1] }]*/
 
-var data = ['foo', 'bar', 'baz'];
-var dataLast = data.length && data[data.length - 1];
+const data = ['foo', 'bar', 'baz'];
+const dataLast = data.length && data[data.length - 1];
 ```
 
 :::
@@ -122,13 +121,14 @@ Examples of **correct** code for the `{ "ignoreArrayIndexes": true }` option:
 ```js
 /*eslint no-magic-numbers: ["error", { "ignoreArrayIndexes": true }]*/
 
-var item = data[2];
+const item = data[2];
 
 data[100] = a;
 
 f(data[0]);
 
 a = data[-0]; // same as data[0], -0 will be coerced to "0"
+a = data[+1]; // same as data[1], +1 will be coerced to "1"
 
 a = data[0xAB];
 
@@ -194,6 +194,46 @@ let head;
 
 :::
 
+### ignoreClassFieldInitialValues
+
+A boolean to specify if numbers used as initial values of class fields are considered okay. `false` by default.
+
+Examples of **correct** code for the `{ "ignoreClassFieldInitialValues": true }` option:
+
+::: correct
+
+```js
+/*eslint no-magic-numbers: ["error", { "ignoreClassFieldInitialValues": true }]*/
+
+class C {
+    foo = 2;
+    bar = -3;
+    tux = +1;
+    #baz = 4;
+    static qux = 5;
+}
+```
+
+:::
+
+Examples of **incorrect** code for the `{ "ignoreClassFieldInitialValues": true }` option:
+
+::: incorrect
+
+```js
+/*eslint no-magic-numbers: ["error", { "ignoreClassFieldInitialValues": true }]*/
+
+class C {
+    foo = 2 + 3;
+}
+
+class D {
+    2;
+}
+```
+
+:::
+
 ### enforceConst
 
 A boolean to specify if we should check for the const keyword in variable declaration of numbers. `false` by default.
@@ -205,9 +245,9 @@ Examples of **incorrect** code for the `{ "enforceConst": true }` option:
 ```js
 /*eslint no-magic-numbers: ["error", { "enforceConst": true }]*/
 
-var TAX = 0.25;
+let TAX = 0.25;
 
-var dutyFreePrice = 100,
+let dutyFreePrice = 100,
     finalPrice = dutyFreePrice + (dutyFreePrice * TAX);
 ```
 
@@ -224,11 +264,11 @@ Examples of **incorrect** code for the `{ "detectObjects": true }` option:
 ```js
 /*eslint no-magic-numbers: ["error", { "detectObjects": true }]*/
 
-var magic = {
+const magic = {
   tax: 0.25
 };
 
-var dutyFreePrice = 100,
+const dutyFreePrice = 100,
     finalPrice = dutyFreePrice + (dutyFreePrice * magic.tax);
 ```
 
@@ -241,14 +281,142 @@ Examples of **correct** code for the `{ "detectObjects": true }` option:
 ```js
 /*eslint no-magic-numbers: ["error", { "detectObjects": true }]*/
 
-var TAX = 0.25;
+const TAX = 0.25;
 
-var magic = {
+const magic = {
   tax: TAX
 };
 
-var dutyFreePrice = 100,
+const dutyFreePrice = 100,
     finalPrice = dutyFreePrice + (dutyFreePrice * magic.tax);
+```
+
+:::
+
+### ignoreEnums (TypeScript only)
+
+Whether enums used in TypeScript are considered okay. `false` by default.
+
+Examples of **incorrect** code for the `{ "ignoreEnums": false }` option:
+
+::: incorrect
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreEnums": false }]*/
+
+enum foo {
+  SECOND = 1000,
+}
+```
+
+:::
+
+Examples of **correct** code for the `{ "ignoreEnums": true }` option:
+
+::: correct
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreEnums": true }]*/
+
+enum foo {
+  SECOND = 1000,
+}
+```
+
+:::
+
+### ignoreNumericLiteralTypes (TypeScript only)
+
+Whether numbers used in TypeScript numeric literal types are considered okay. `false` by default.
+
+Examples of **incorrect** code for the `{ "ignoreNumericLiteralTypes": false }` option:
+
+::: incorrect
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreNumericLiteralTypes": false }]*/
+
+type Foo = 1 | 2 | 3;
+```
+
+:::
+
+Examples of **correct** code for the `{ "ignoreNumericLiteralTypes": true }` option:
+
+::: correct
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreNumericLiteralTypes": true }]*/
+
+type Foo = 1 | 2 | 3;
+```
+
+:::
+
+### ignoreReadonlyClassProperties (TypeScript only)
+
+Whether numbers used in TypeScript readonly class properties are considered okay. `false` by default.
+
+Examples of **incorrect** code for the `{ "ignoreReadonlyClassProperties": false }` option:
+
+::: incorrect
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreReadonlyClassProperties": false }]*/
+
+class Foo {
+  readonly A = 1;
+  readonly B = 2;
+  public static readonly C = 1;
+  static readonly D = 1;
+}
+```
+
+:::
+
+Examples of **correct** code for the `{ "ignoreReadonlyClassProperties": true }` option:
+
+::: correct
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreReadonlyClassProperties": true }]*/
+
+class Foo {
+  readonly A = 1;
+  readonly B = 2;
+  public static readonly C = 1;
+  static readonly D = 1;
+}
+```
+
+:::
+
+### ignoreTypeIndexes (TypeScript only)
+
+Whether numbers used to index types are okay. `false` by default.
+
+Examples of **incorrect** code for the `{ "ignoreTypeIndexes": false }` option:
+
+::: incorrect
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreTypeIndexes": false }]*/
+
+type Foo = Bar[0];
+type Baz = Parameters<Foo>[2];
+```
+
+:::
+
+Examples of **correct** code for the `{ "ignoreTypeIndexes": true }` option:
+
+::: correct
+
+```ts
+/*eslint no-magic-numbers: ["error", { "ignoreTypeIndexes": true }]*/
+
+type Foo = Bar[0];
+type Baz = Parameters<Foo>[2];
 ```
 
 :::

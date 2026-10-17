@@ -1,22 +1,22 @@
 ---
 title: require-jsdoc
-layout: doc
 rule_type: suggestion
 related_rules:
 - valid-jsdoc
 ---
 
+:::important
+This rule was removed in ESLint v9.0.0 and replaced by the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc) equivalent.
+:::
 
-This rule was [**deprecated**](https://eslint.org/blog/2018/11/jsdoc-end-of-life) in ESLint v5.10.0.
-
-[JSDoc](http://usejsdoc.org) is a JavaScript API documentation generator. It uses specially-formatted comments inside of code to generate API documentation automatically. For example, this is what a JSDoc comment looks like for a function:
+[JSDoc](https://jsdoc.app/) is a JavaScript API documentation generator. It uses specially-formatted comments inside of code to generate API documentation automatically. For example, this is what a JSDoc comment looks like for a function:
 
 ```js
 /**
  * Adds two numbers together.
- * @param {int} num1 The first number.
- * @param {int} num2 The second number.
- * @returns {int} The sum of the two numbers.
+ * @param {number} num1 The first number.
+ * @param {number} num2 The second number.
+ * @returns {number} The sum of the two numbers.
  */
 function sum(num1, num2) {
     return num1 + num2;
@@ -78,7 +78,7 @@ function foo() {
     return 10;
 }
 
-var foo = () => {
+var bar = () => {
     return 10;
 };
 
@@ -88,11 +88,11 @@ class Foo {
     }
 }
 
-var foo = function() {
+var bar = function() {
     return 10;
 };
 
-var foo = {
+var bar = {
     bar: function() {
         return 10;
     },
@@ -129,24 +129,24 @@ function foo() {
 
 /**
  * It returns test + 10
- * @params {int} test - some number
- * @returns {int} sum of test and 10
+ * @params {number} test - some number
+ * @returns {number} sum of test and 10
  */
-var foo = (test) => {
+var bar = (test) => {
     return test + 10;
 }
 
 /**
  * It returns 10
  */
-var foo = () => {
+var bar = () => {
     return 10;
 }
 
 /**
  * It returns 10
  */
-var foo = function() {
+var bar = function() {
     return 10;
 }
 
@@ -170,11 +170,11 @@ class Foo {
 /**
  * It returns 10
  */
-var foo = function() {
+var bar = function() {
     return 10;
 };
 
-var foo = {
+var bar = {
     /**
     * It returns 10
     */

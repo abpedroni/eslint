@@ -1,7 +1,8 @@
 ---
 title: no-import-assign
-layout: doc
 rule_type: problem
+handled_by_typescript: true
+extra_typescript_info: Note that the compiler will not catch the `Object.assign()` case. Thus, if you use `Object.assign()` in your codebase, this rule will still provide some value.
 ---
 
 
@@ -54,6 +55,10 @@ test(mod_ns) // Not errored because it doesn't know that 'test' updates the memb
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

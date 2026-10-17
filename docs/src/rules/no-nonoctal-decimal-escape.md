@@ -1,6 +1,5 @@
 ---
 title: no-nonoctal-decimal-escape
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-octal-escape
@@ -31,7 +30,7 @@ This rule disallows `\8` and `\9` escape sequences in string literals.
 
 Examples of **incorrect** code for this rule:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-nonoctal-decimal-escape: "error"*/
@@ -40,20 +39,20 @@ Examples of **incorrect** code for this rule:
 
 "\9";
 
-var foo = "w\8less";
+const foo = "w\8less";
 
-var bar = "December 1\9";
+const bar = "December 1\9";
 
-var baz = "Don't use \8 and \9 escapes.";
+const baz = "Don't use \8 and \9 escapes.";
 
-var quux = "\0\8";
+const quux = "\0\8";
 ```
 
 :::
 
 Examples of **correct** code for this rule:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-nonoctal-decimal-escape: "error"*/
@@ -62,13 +61,17 @@ Examples of **correct** code for this rule:
 
 "9";
 
-var foo = "w8less";
+const foo = "w8less";
 
-var bar = "December 19";
+const bar = "December 19";
 
-var baz = "Don't use \\8 and \\9 escapes.";
+const baz = "Don't use \\8 and \\9 escapes.";
 
-var quux = "\0\u0038";
+const quux = "\0\u0038";
 ```
 
 :::
+
+## Options
+
+This rule has no options.

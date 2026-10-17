@@ -1,4 +1,4 @@
-{% from 'components/rule-list.macro.html' import ruleList %}
+{% from 'components/rule-list.macro.html' import replacementRuleList %}
 
 {%- macro rule(params) -%}
 <article class="rule {% if params.deprecated == true %}rule--deprecated{% endif %} {% if params.removed == true %}rule--removed{% endif %}">
@@ -9,7 +9,7 @@
             <span class="rule__status">deprecated</span>
         </p>
         {%- if params.replacedBy|length -%}
-        <p class="rule__description">Replaced by {{ ruleList({ rules: params.replacedBy }) }}</p>
+        <p class="rule__description">Replaced by {{ replacementRuleList({ specifiers: params.replacedBy }) }}</p>
         {%- else -%}<p class="rule__description">{{ params.description }}</p>
         {%- endif -%}
         {%- elseif params.removed == true -%}
@@ -17,35 +17,38 @@
             {{ params.name }}
             <span class="rule__status">removed</span>
         </p>
-        {%- if params.replacedBy -%}
-        <p class="rule__description">Replaced by {{ ruleList({ rules: params.replacedBy }) }}</p>
+        {%- if params.replacedBy|length -%}
+        <p class="rule__description">Replaced by {{ replacementRuleList({ specifiers: params.replacedBy }) }}</p>
         {%- else -%}<p class="rule__description">{{ params.description }}</p>
         {%- endif -%}
         {%- else -%}
+        <div class="rule__name_wrapper">
         <a href="{{ ['/rules/', params.name] | join | url }}" class="rule__name">{{ params.name }}</a>
+            {%- if params.categories and params.categories.frozen %}
+                <p class="frozen"> ❄️ <span class="visually-hidden">Frozen</span></p>
+            {%- endif -%}
+        </div>
         <p class="rule__description">{{ params.description }}</p>
         {%- endif -%}
     </div>
+    {%- if params.removed == undefined -%}
     <div class="rule__categories">
         <span class="visually-hidden">Categories:</span>
-        {%- if (params.deprecated) or (params.removed) -%}
-            <p class="rule__categories__type">
-                <svg width="24" height="24" viewBox="12 12 20 20" fill="none" aria-hidden="true" focusable="false" style="position: relative; right: -1px;">
-                    <path d="M28.5 16L16.5 28M16.5 16L28.5 28" stroke="#F63D68" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </p>
+        {%- if params.deprecated -%}
+            <p class="rule__categories__type">❌</p>
             {%- else -%}
-            <p class="rule__categories__type" {% if params.categories.recommended == false %}aria-hidden="true" {%- endif -%}>
+            <p class="rule__categories__type"{% if params.categories.recommended == false %} aria-hidden="true"{%- endif -%}>
             ✅ <span class="visually-hidden">Extends</span>
         </p>
         {%- endif -%}
 
-        <p class="rule__categories__type" {% if params.categories.fixable == false %}aria-hidden="true" {%- endif -%}>
-            🛠 <span class="visually-hidden">Fix</span>
+        <p class="rule__categories__type"{% if params.categories.fixable == false %} aria-hidden="true"{%- endif -%}>
+            🔧 <span class="visually-hidden">Fix</span>
         </p>
-        <p class="rule__categories__type" {% if params.categories.hasSuggestions == false %}aria-hidden="true" {%- endif -%}>
+        <p class="rule__categories__type"{% if params.categories.hasSuggestions == false %} aria-hidden="true"{%- endif -%}>
             💡 <span class="visually-hidden">Suggestions</span>
         </p>
     </div>
+    {%- endif -%}
 </article>
 {%- endmacro -%}

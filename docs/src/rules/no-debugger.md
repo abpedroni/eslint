@@ -1,6 +1,5 @@
 ---
 title: no-debugger
-layout: doc
 rule_type: problem
 related_rules:
 - no-alert
@@ -45,6 +44,10 @@ function isTruthy(x) {
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

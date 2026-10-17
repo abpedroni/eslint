@@ -1,6 +1,5 @@
 ---
 title: no-dupe-else-if
-layout: doc
 rule_type: problem
 related_rules:
 - no-duplicate-case
@@ -188,6 +187,10 @@ if (a) {
     }
 }
 ```
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

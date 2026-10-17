@@ -1,11 +1,10 @@
 ---
 title: prefer-promise-reject-errors
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-throw-literal
 further_reading:
-- http://bluebirdjs.com/docs/warning-explanations.html#warning-a-promise-was-rejected-with-a-non-error
+- https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-rejected-with-a-non-error
 ---
 
 
@@ -61,7 +60,7 @@ new Promise(function(resolve, reject) {
   reject(new Error("something bad happened"));
 });
 
-var foo = getUnknownValue();
+const foo = getUnknownValue();
 Promise.reject(foo);
 ```
 

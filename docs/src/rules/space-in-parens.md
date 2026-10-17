@@ -1,15 +1,11 @@
 ---
 title: space-in-parens
-layout: doc
 rule_type: layout
 related_rules:
 - array-bracket-spacing
 - object-curly-spacing
 - computed-property-spacing
 ---
-
-
-
 Some style guides require or disallow spaces inside of parentheses:
 
 ```js
@@ -138,8 +134,6 @@ Empty parens exception and behavior:
 * `never` (default) requires `()`
 * `always` excepting `empty` requires `()`
 * `never` excepting `empty` requires `( )` (empty parens without a space is here forbidden)
-
-### Examples
 
 Examples of **incorrect** code for this rule with the `"never", { "exceptions": ["{}"] }` option:
 

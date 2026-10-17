@@ -1,6 +1,5 @@
 ---
 title: no-new
-layout: doc
 rule_type: suggestion
 ---
 
@@ -8,7 +7,7 @@ rule_type: suggestion
 The goal of using `new` with a constructor is typically to create an object of a particular type and store that object in a variable, such as:
 
 ```js
-var person = new Person();
+const person = new Person();
 ```
 
 It's less common to use `new` and not store the result, such as:
@@ -42,9 +41,13 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-new: "error"*/
 
-var thing = new Thing();
+const thing = new Thing();
 
-Thing();
+Foo();
 ```
 
 :::
+
+## Options
+
+This rule has no options.

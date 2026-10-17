@@ -1,6 +1,5 @@
 ---
 title: no-multi-str
-layout: doc
 rule_type: suggestion
 ---
 
@@ -8,7 +7,7 @@ rule_type: suggestion
 It's possible to create multiline strings in JavaScript by using a slash before a newline, such as:
 
 ```js
-var x = "Line 1 \
+const x = "Line 1 \
          Line 2";
 ```
 
@@ -25,7 +24,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-multi-str: "error"*/
 
-var x = "some very \
+const x = "some very \
 long text";
 ```
 
@@ -38,10 +37,14 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-multi-str: "error"*/
 
-var x = "some very long text";
+const x = "some very long text";
 
-var x = "some very " +
+const y = "some very " +
         "long text";
 ```
 
 :::
+
+## Options
+
+This rule has no options.

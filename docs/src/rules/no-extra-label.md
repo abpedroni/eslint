@@ -1,6 +1,5 @@
 ---
 title: no-extra-label
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-labels
@@ -88,6 +87,10 @@ C: switch (a) {
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

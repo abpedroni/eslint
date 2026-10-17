@@ -1,6 +1,5 @@
 ---
 title: no-useless-escape
-layout: doc
 rule_type: suggestion
 ---
 
@@ -44,7 +43,7 @@ Examples of **incorrect** code for this rule:
 
 Examples of **correct** code for this rule:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-useless-escape: "error"*/
@@ -64,6 +63,42 @@ Examples of **correct** code for this rule:
 /[[]/;
 /[\]]/;
 /[a-z-]/;
+```
+
+:::
+
+## Options
+
+This rule has an object option:
+
+* `allowRegexCharacters` - An array of characters that should be allowed to have unnecessary escapes in regular expressions. This is useful for characters like `-` where escaping can prevent accidental character ranges. For example, in `/[0\-]/`, the escape is technically unnecessary but helps prevent the pattern from becoming a range if another character is added later (e.g., `/[0\-9]/` vs `/[0-9]/`).
+
+### allowRegexCharacters
+
+Examples of **incorrect** code for the `{ "allowRegexCharacters": ["-"] }` option:
+
+::: incorrect
+
+```js
+/*eslint no-useless-escape: ["error", { "allowRegexCharacters": ["-"] }]*/
+
+/\!/;
+/\@/;
+/[a-z\^]/;
+```
+
+:::
+
+Examples of **correct** code for the `{ "allowRegexCharacters": ["-"] }` option:
+
+::: correct
+
+```js
+/*eslint no-useless-escape: ["error", { "allowRegexCharacters": ["-"] }]*/
+
+/[0\-]/;
+/[\-9]/;
+/a\-b/;
 ```
 
 :::

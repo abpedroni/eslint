@@ -1,11 +1,7 @@
 ---
 title: space-infix-ops
-layout: doc
 rule_type: layout
 ---
-
-
-
 While formatting preferences are very personal, a number of style guides require spaces around operators, such as:
 
 ```js
@@ -46,7 +42,6 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint space-infix-ops: "error"*/
-/*eslint-env es6*/
 
 a+b
 
@@ -58,7 +53,7 @@ a?b:c
 
 const a={b:1};
 
-var {a=0}=bar;
+var {b=0}=bar;
 
 function foo(a=0) { }
 ```
@@ -71,7 +66,6 @@ Examples of **correct** code for this rule:
 
 ```js
 /*eslint space-infix-ops: "error"*/
-/*eslint-env es6*/
 
 a + b
 
@@ -81,7 +75,7 @@ a ? b : c
 
 const a = {b:1};
 
-var {a = 0} = bar;
+var {b = 0} = bar;
 
 function foo(a = 0) { }
 ```

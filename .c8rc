@@ -1,13 +1,6 @@
 {
-    "include": [
-        "bin/**/*.js",
-        "conf/**/*.js",
-        "lib/**/*.js"
-    ],
-    "reporter": [
-        "lcov",
-        "text-summary",
-        "cobertura"
-    ],
-    "sourceMap": true
+  "all": true,
+  "include": ["bin", "conf", "lib", "messages"],
+  "reporter": ["lcov", "text-summary", "cobertura"],
+  "sourceMap": true
 }

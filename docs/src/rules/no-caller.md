@@ -1,6 +1,5 @@
 ---
 title: no-caller
-layout: doc
 rule_type: suggestion
 ---
 
@@ -9,7 +8,7 @@ The use of `arguments.caller` and `arguments.callee` make several code optimizat
 
 ```js
 function foo() {
-    var callee = arguments.callee;
+    const callee = arguments.callee;
 }
 ```
 
@@ -60,3 +59,7 @@ function foo(n) {
 ```
 
 :::
+
+## Options
+
+This rule has no options.

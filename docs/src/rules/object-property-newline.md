@@ -1,6 +1,5 @@
 ---
 title: object-property-newline
-layout: doc
 rule_type: layout
 related_rules:
 - brace-style
@@ -8,9 +7,6 @@ related_rules:
 - key-spacing
 - object-curly-spacing
 ---
-
-
-
 This rule permits you to restrict the locations of property specifications in object literals. You may prohibit any part of any property specification from appearing on the same line as any part of any other property specification. You may make this prohibition absolute, or, by invoking an object option, you may allow an exception, permitting an object literal to have all parts of all of its property specifications on a single line.
 
 ## Rule Details
@@ -180,8 +176,6 @@ The modification does not depend on whether the object option is set to `true`. 
 ESLint does not correct a violation of this rule if a comment immediately precedes the second or subsequent property specification on a line, since ESLint cannot determine which line to put the comment onto.
 
 As illustrated above, the `--fix` option, applied to this rule, does not comply with other rules, such as `indent`, but, if those other rules are also in effect, the option applies them, too.
-
-## Examples
 
 Examples of **incorrect** code for this rule, with no object option or with `allowAllPropertiesOnSameLine` set to `false`:
 

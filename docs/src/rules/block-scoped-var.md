@@ -1,6 +1,5 @@
 ---
 title: block-scoped-var
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://www.adequatelygood.com/JavaScript-Scoping-and-Hoisting.html
@@ -120,3 +119,7 @@ class C {
 ```
 
 :::
+
+## Options
+
+This rule has no options.

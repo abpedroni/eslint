@@ -1,15 +1,11 @@
 ---
 title: comma-style
-layout: doc
 rule_type: layout
 related_rules:
 - operator-linebreak
 further_reading:
 - https://gist.github.com/isaacs/357981
 ---
-
-
-
 The Comma Style rule enforces styles for comma-separated lists. There are two comma styles primarily used in JavaScript:
 
 * The standard style, in which commas are placed at the end of the current line
@@ -70,7 +66,7 @@ var foo = 1
 var foo = ["apples"
            , "oranges"];
 
-function bar() {
+function baz() {
     return {
         "a": 1
         ,"b:": 2
@@ -95,7 +91,7 @@ var foo = 1,
 var foo = ["apples",
            "oranges"];
 
-function bar() {
+function baz() {
     return {
         "a": 1,
         "b:": 2
@@ -120,7 +116,7 @@ var foo = 1,
 var foo = ["apples",
            "oranges"];
 
-function bar() {
+function baz() {
     return {
         "a": 1,
         "b:": 2
@@ -145,7 +141,7 @@ var foo = 1
 var foo = ["apples"
           ,"oranges"];
 
-function bar() {
+function baz() {
     return {
         "a": 1
         ,"b:": 2

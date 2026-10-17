@@ -1,9 +1,7 @@
 ---
 title: line-comment-position
-layout: doc
 rule_type: layout
 ---
-
 
 Line comments can be positioned above or beside code. This rule helps teams maintain a consistent style.
 

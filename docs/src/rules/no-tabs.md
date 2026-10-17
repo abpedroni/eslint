@@ -1,10 +1,7 @@
 ---
 title: no-tabs
-layout: doc
 rule_type: layout
 ---
-
-
 Some style guides don't allow the use of tab characters at all, including within comments.
 
 ## Rule Details
@@ -13,26 +10,33 @@ This rule looks for tabs anywhere inside a file: code, comments or anything else
 
 Examples of **incorrect** code for this rule:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD010 -->
 ::: incorrect
 
 ```js
-var a \t= 2;
+/* eslint no-tabs: "error" */
+
+var a 	= 2;
 
 /**
-* \t\t it's a test function
+* 		 it's a test function
 */
 function test(){}
 
-var x = 1; // \t test
+var x = 1; // 	 test
 ```
 
 :::
+<!-- markdownlint-restore -->
 
 Examples of **correct** code for this rule:
 
 ::: correct
 
 ```js
+/* eslint no-tabs: "error" */
+
 var a = 2;
 
 /**
@@ -55,19 +59,22 @@ This rule has an optional object option with the following properties:
 
 Examples of **correct** code for this rule with the `allowIndentationTabs: true` option:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD010 -->
 ::: correct
 
 ```js
 /* eslint no-tabs: ["error", { allowIndentationTabs: true }] */
 
 function test() {
-\tdoSomething();
+	doSomething();
 }
 
-\t// comment with leading indentation tab
+	// comment with leading indentation tab
 ```
 
 :::
+<!-- markdownlint-restore -->
 
 ## When Not To Use It
 

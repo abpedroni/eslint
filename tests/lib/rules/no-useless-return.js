@@ -9,22 +9,25 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-useless-return"),
-    { RuleTester } = require("../../../lib/rule-tester");
-
+	RuleTester = require("../../../lib/rule-tester/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({
+	languageOptions: {
+		ecmaVersion: 5,
+		sourceType: "script",
+	},
+});
 
 ruleTester.run("no-useless-return", rule, {
-
-    valid: [
-        "function foo() { return 5; }",
-        "function foo() { return null; }",
-        "function foo() { return doSomething(); }",
-        `
+	valid: [
+		"function foo() { return 5; }",
+		"function foo() { return null; }",
+		"function foo() { return doSomething(); }",
+		`
           function foo() {
             if (bar) {
               doSomething();
@@ -35,7 +38,7 @@ ruleTester.run("no-useless-return", rule, {
             qux();
           }
         `,
-        `
+		`
           function foo() {
             switch (bar) {
               case 1:
@@ -46,7 +49,7 @@ ruleTester.run("no-useless-return", rule, {
             }
           }
         `,
-        `
+		`
           function foo() {
             switch (bar) {
               default:
@@ -57,7 +60,7 @@ ruleTester.run("no-useless-return", rule, {
             }
           }
         `,
-        `
+		`
           function foo() {
             switch (bar) {
               case 1:
@@ -73,21 +76,21 @@ ruleTester.run("no-useless-return", rule, {
             }
           }
         `,
-        `
+		`
           function foo() {
             for (var foo = 0; foo < 10; foo++) {
               return;
             }
           }
         `,
-        `
+		`
           function foo() {
             for (var foo in bar) {
               return;
             }
           }
         `,
-        `
+		`
           function foo() {
             try {
               return 5;
@@ -96,45 +99,67 @@ ruleTester.run("no-useless-return", rule, {
             }
           }
         `,
-        `
+		`
+          function foo() {
+            try {
+              bar();
+              return;
+            } catch (err) {}
+            baz();
+          }
+        `,
+		`
+          function foo() {
+              if (something) {
+                  try {
+                      bar();
+                      return;
+                  } catch (err) {}
+              }
+              baz();
+          }
+        `,
+		`
           function foo() {
             return;
             doSomething();
           }
         `,
-        {
-            code: `
+		{
+			code: `
               function foo() {
                 for (var foo of bar) return;
               }
             `,
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: "() => { if (foo) return; bar(); }",
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: "() => 5",
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: "() => { return; doSomething(); }",
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: "if (foo) { return; } doSomething();",
-            parserOptions: { ecmaFeatures: { globalReturn: true } }
-        },
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: "() => { if (foo) return; bar(); }",
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: "() => 5",
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: "() => { return; doSomething(); }",
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: "if (foo) { return; } doSomething();",
+			languageOptions: {
+				parserOptions: { ecmaFeatures: { globalReturn: true } },
+			},
+		},
 
-        // https://github.com/eslint/eslint/issues/7477
-        `
+		// https://github.com/eslint/eslint/issues/7477
+		`
           function foo() {
             if (bar) return;
             return baz;
           }
         `,
-        `
+		`
           function foo() {
             if (bar) {
               return;
@@ -142,7 +167,7 @@ ruleTester.run("no-useless-return", rule, {
             return baz;
           }
         `,
-        `
+		`
           function foo() {
             if (bar) baz();
             else return;
@@ -150,8 +175,8 @@ ruleTester.run("no-useless-return", rule, {
           }
         `,
 
-        // https://github.com/eslint/eslint/issues/7583
-        `
+		// https://github.com/eslint/eslint/issues/7583
+		`
           function foo() {
             return;
             while (foo) return;
@@ -159,16 +184,16 @@ ruleTester.run("no-useless-return", rule, {
           }
         `,
 
-        // https://github.com/eslint/eslint/issues/7855
-        `
+		// https://github.com/eslint/eslint/issues/7855
+		`
           try {
             throw new Error('foo');
             while (false);
           } catch (err) {}
         `,
 
-        // https://github.com/eslint/eslint/issues/11647
-        `
+		// https://github.com/eslint/eslint/issues/11647
+		`
           function foo(arg) {
             throw new Error("Debugging...");
             if (!arg) {
@@ -176,46 +201,63 @@ ruleTester.run("no-useless-return", rule, {
             }
             console.log(arg);
           }
-        `
-    ],
+        `,
 
-    invalid: [
-        {
-            code: "function foo() { return; }",
-            output: "function foo() {  }"
-        },
-        {
-            code: "function foo() { doSomething(); return; }",
-            output: "function foo() { doSomething();  }"
-        },
-        {
-            code: "function foo() { if (condition) { bar(); return; } else { baz(); } }",
-            output: "function foo() { if (condition) { bar();  } else { baz(); } }"
-        },
-        {
-            code: "function foo() { if (foo) return; }",
-            output: "function foo() { if (foo) return; }"
-        },
-        {
-            code: "function foo() { bar(); return/**/; }",
-            output: null
-        },
-        {
-            code: "function foo() { bar(); return//\n; }",
-            output: null
-        },
-        {
-            code: "foo(); return;",
-            output: "foo(); ",
-            parserOptions: { ecmaFeatures: { globalReturn: true } }
-        },
-        {
-            code: "if (foo) { bar(); return; } else { baz(); }",
-            output: "if (foo) { bar();  } else { baz(); }",
-            parserOptions: { ecmaFeatures: { globalReturn: true } }
-        },
-        {
-            code: `
+		// https://github.com/eslint/eslint/pull/16996#discussion_r1138622844
+		`
+        function foo() {
+          try {
+              bar();
+              return;
+          } finally {
+              baz();
+          }
+          qux();
+        }
+        `,
+	],
+
+	invalid: [
+		{
+			code: "function foo() { return; }",
+			output: "function foo() {  }",
+		},
+		{
+			code: "function foo() { doSomething(); return; }",
+			output: "function foo() { doSomething();  }",
+		},
+		{
+			code: "function foo() { if (condition) { bar(); return; } else { baz(); } }",
+			output: "function foo() { if (condition) { bar();  } else { baz(); } }",
+		},
+		{
+			code: "function foo() { if (foo) return; }",
+			output: null,
+		},
+		{
+			code: "function foo() { bar(); return/**/; }",
+			output: null,
+		},
+		{
+			code: "function foo() { bar(); return//\n; }",
+			output: null,
+		},
+		{
+			code: "foo(); return;",
+			output: "foo(); ",
+			languageOptions: {
+				parserOptions: { ecmaFeatures: { globalReturn: true } },
+			},
+		},
+		{
+			code: "if (foo) { bar(); return; } else { baz(); }",
+			output: "if (foo) { bar();  } else { baz(); }",
+			languageOptions: {
+				parserOptions: { ecmaFeatures: { globalReturn: true } },
+			},
+		},
+		{
+			code: `
               function foo() {
                 if (foo) {
                   return;
@@ -223,7 +265,7 @@ ruleTester.run("no-useless-return", rule, {
                 return;
               }
             `,
-            output: `
+			output: `
               function foo() {
                 if (foo) {
                   
@@ -231,13 +273,17 @@ ruleTester.run("no-useless-return", rule, {
                 return;
               }
             `, // Other case is fixed in the second pass.
-            errors: [
-                { messageId: "unnecessaryReturn", type: "ReturnStatement" },
-                { messageId: "unnecessaryReturn", type: "ReturnStatement" }
-            ]
-        },
-        {
-            code: `
+			errors: [
+				{
+					messageId: "unnecessaryReturn",
+				},
+				{
+					messageId: "unnecessaryReturn",
+				},
+			],
+		},
+		{
+			code: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -248,7 +294,7 @@ ruleTester.run("no-useless-return", rule, {
                 }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -258,10 +304,10 @@ ruleTester.run("no-useless-return", rule, {
                     
                 }
               }
-            `
-        },
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
               function foo() {
                 switch (bar) {
                   default:
@@ -272,7 +318,7 @@ ruleTester.run("no-useless-return", rule, {
                 }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 switch (bar) {
                   default:
@@ -282,10 +328,10 @@ ruleTester.run("no-useless-return", rule, {
                     
                 }
               }
-            `
-        },
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -299,7 +345,7 @@ ruleTester.run("no-useless-return", rule, {
                 }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -312,10 +358,10 @@ ruleTester.run("no-useless-return", rule, {
                     doSomethingElse();
                 }
               }
-            `
-        },
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -331,7 +377,7 @@ ruleTester.run("no-useless-return", rule, {
                 }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -346,10 +392,10 @@ ruleTester.run("no-useless-return", rule, {
                     doSomethingElse();
                 }
               }
-            `
-        },
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -361,7 +407,7 @@ ruleTester.run("no-useless-return", rule, {
                 }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 switch (bar) {
                   case 1:
@@ -372,42 +418,150 @@ ruleTester.run("no-useless-return", rule, {
                   default:
                 }
               }
-            `
-        },
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
               function foo() {
                 try {} catch (err) { return; }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 try {} catch (err) {  }
               }
-            `
-        },
-
-        /*
-         * FIXME: Re-add this case (removed due to https://github.com/eslint/eslint/issues/7481):
-         * https://github.com/eslint/eslint/blob/261d7287820253408ec87c344beccdba2fe829a4/tests/lib/rules/no-useless-return.js#L308-L329
-         */
-
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
+              function foo() {
+                try {
+                  foo();
+                  return;
+                } catch (err) {
+                  return 5;
+                }
+              }
+            `,
+			output: `
+              function foo() {
+                try {
+                  foo();
+                  
+                } catch (err) {
+                  return 5;
+                }
+              }
+            `,
+		},
+		{
+			code: `
+              function foo() {
+                  if (something) {
+                      try {
+                          bar();
+                          return;
+                      } catch (err) {}
+                  }
+              }
+            `,
+			output: `
+              function foo() {
+                  if (something) {
+                      try {
+                          bar();
+                          
+                      } catch (err) {}
+                  }
+              }
+            `,
+		},
+		{
+			code: `
+              function foo() {
+                try {
+                  return;
+                } catch (err) {
+                  foo();
+                }
+              }
+            `,
+			output: `
+              function foo() {
+                try {
+                  
+                } catch (err) {
+                  foo();
+                }
+              }
+            `,
+		},
+		{
+			code: `
+              function foo() {
+                  try {
+                      return;
+                  } finally {
+                      bar();
+                  }
+              }
+            `,
+			output: `
+              function foo() {
+                  try {
+                      
+                  } finally {
+                      bar();
+                  }
+              }
+            `,
+		},
+		{
+			code: `
+              function foo() {
+                try {
+                  bar();
+                } catch (e) {
+                  try {
+                    baz();
+                    return;
+                  } catch (e) {
+                    qux();
+                  }
+                }
+              }
+            `,
+			output: `
+              function foo() {
+                try {
+                  bar();
+                } catch (e) {
+                  try {
+                    baz();
+                    
+                  } catch (e) {
+                    qux();
+                  }
+                }
+              }
+            `,
+		},
+		{
+			code: `
               function foo() {
                 try {} finally {}
                 return;
               }
             `,
-            output: `
+			output: `
               function foo() {
                 try {} finally {}
                 
               }
-            `
-        },
-        {
-            code: `
+            `,
+		},
+		{
+			code: `
               function foo() {
                 try {
                   return 5;
@@ -418,7 +572,7 @@ ruleTester.run("no-useless-return", rule, {
                 }
               }
             `,
-            output: `
+			output: `
               function foo() {
                 try {
                   return 5;
@@ -428,21 +582,33 @@ ruleTester.run("no-useless-return", rule, {
                   }
                 }
               }
-            `
-        },
-        {
-            code: "() => { return; }",
-            output: "() => {  }",
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: "function foo() { return; return; }",
-            output: "function foo() {  return; }",
-            errors: [{
-                messageId: "unnecessaryReturn",
-                type: "ReturnStatement",
-                column: 18
-            }]
-        }
-    ].map(invalidCase => Object.assign({ errors: [{ messageId: "unnecessaryReturn", type: "ReturnStatement" }] }, invalidCase))
+            `,
+		},
+		{
+			code: "() => { return; }",
+			output: "() => {  }",
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: "function foo() { return; return; }",
+			output: "function foo() {  return; }",
+			errors: [
+				{
+					messageId: "unnecessaryReturn",
+					column: 18,
+				},
+			],
+		},
+	].map(invalidCase =>
+		Object.assign(
+			{
+				errors: [
+					{
+						messageId: "unnecessaryReturn",
+					},
+				],
+			},
+			invalidCase,
+		),
+	),
 });

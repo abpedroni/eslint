@@ -10,43 +10,49 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/symbol-description");
-const { RuleTester } = require("../../../lib/rule-tester");
+const RuleTester = require("../../../lib/rule-tester/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
-const ruleTester = new RuleTester({ env: { es6: true } });
+const ruleTester = new RuleTester({
+	languageOptions: {
+		ecmaVersion: 6,
+		sourceType: "script",
+	},
+});
 
 ruleTester.run("symbol-description", rule, {
+	valid: [
+		'Symbol("Foo");',
+		'var foo = "foo"; Symbol(foo);',
 
-    valid: [
-        "Symbol(\"Foo\");",
-        "var foo = \"foo\"; Symbol(foo);",
+		// Ignore if it's shadowed.
+		"var Symbol = function () {}; Symbol();",
+		"Symbol(); var Symbol = function () {};",
+		"function bar() { var Symbol = function () {}; Symbol(); }",
 
-        // Ignore if it's shadowed.
-        "var Symbol = function () {}; Symbol();",
-        "Symbol(); var Symbol = function () {};",
-        "function bar() { var Symbol = function () {}; Symbol(); }",
+		// Ignore if it's an argument.
+		"function bar(Symbol) { Symbol(); }",
+	],
 
-        // Ignore if it's an argument.
-        "function bar(Symbol) { Symbol(); }"
-    ],
-
-    invalid: [
-        {
-            code: "Symbol();",
-            errors: [{
-                messageId: "expected",
-                type: "CallExpression"
-            }]
-        },
-        {
-            code: "Symbol(); Symbol = function () {};",
-            errors: [{
-                messageId: "expected",
-                type: "CallExpression"
-            }]
-        }
-    ]
+	invalid: [
+		{
+			code: "Symbol();",
+			errors: [
+				{
+					messageId: "expected",
+				},
+			],
+		},
+		{
+			code: "Symbol(); Symbol = function () {};",
+			errors: [
+				{
+					messageId: "expected",
+				},
+			],
+		},
+	],
 });

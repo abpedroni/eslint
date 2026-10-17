@@ -1,6 +1,5 @@
 ---
 title: no-unused-expressions
-layout: doc
 rule_type: suggestion
 ---
 
@@ -16,16 +15,16 @@ This rule aims to eliminate unused expressions which have no effect on the state
 This rule does not apply to function calls or constructor calls with the `new` operator, because they could have *side effects* on the state of the program.
 
 ```js
-var i = 0;
+let i = 0;
 function increment() { i += 1; }
 increment(); // return value is unused, but i changed as a side effect
 
-var nThings = 0;
+let nThings = 0;
 function Thing() { nThings += 1; }
 new Thing(); // constructed object is unused, but nThings changed as a side effect
 ```
 
-This rule does not apply to directives (which are in the form of literal string expressions such as `"use strict";` at the beginning of a script, module, or function).
+This rule does not apply to directives (which are in the form of literal string expressions such as `"use strict";` at the beginning of a script, module, or function) when using ES5+ environments. In ES3 environments, directives are treated as unused expressions by default, but this behavior can be changed using the `ignoreDirectives` option.
 
 Sequence expressions (those using a comma, such as `a = 1, b = 2`) are always considered unused unless their return value is assigned or used in a condition evaluation, or a function call is made with the sequence expression value.
 
@@ -37,6 +36,7 @@ This rule, in its default state, does not require any arguments. If you would li
 * `allowTernary` set to `true` will enable you to use ternary operators in your expressions similarly to short circuit evaluations (Default: `false`).
 * `allowTaggedTemplates` set to `true` will enable you to use tagged template literals in your expressions (Default: `false`).
 * `enforceForJSX` set to `true` will flag unused JSX element expressions (Default: `false`).
+* `ignoreDirectives` set to `true` will prevent directives from being reported as unused expressions when linting with `ecmaVersion: 3` (Default: `false`).
 
 These options allow unused expressions *only if all* of the code paths either directly change the state (for example, assignment statement) or could have *side effects* (for example, function call).
 
@@ -80,7 +80,7 @@ Examples of **correct** code for the default `{ "allowShortCircuit": false, "all
 
 {} // In this context, this is a block statement, not an object literal
 
-{myLabel: someVar} // In this context, this is a block statement with a label and expression, not an object literal
+{ myLabel: foo() } // In this context, this is a block statement with a label and expression, not an object literal
 
 function namedFunctionDeclaration () {}
 
@@ -248,11 +248,11 @@ tag`some tagged template string`;
 
 ### enforceForJSX
 
-JSX is most-commonly used in the React ecosystem, where it is compiled to `React.createElement` expressions. Though free from side-effects, these calls are not automatically flagged by the `no-unused-expression` rule. If you're using React, or any other side-effect-free JSX pragma, this option can be enabled to flag these expressions.
+JSX is most-commonly used in the React ecosystem, where it is compiled to `React.createElement` expressions. Though free from side-effects, these calls are not automatically flagged by the `no-unused-expressions` rule. If you're using React, or any other side-effect-free JSX pragma, this option can be enabled to flag these expressions.
 
 Examples of **incorrect** code for the `{ "enforceForJSX": true }` option:
 
-::: incorrect
+::: incorrect { "parserOptions": { "ecmaFeatures": { "jsx": true } } }
 
 ```jsx
 /*eslint no-unused-expressions: ["error", { "enforceForJSX": true }]*/
@@ -266,14 +266,125 @@ Examples of **incorrect** code for the `{ "enforceForJSX": true }` option:
 
 Examples of **correct** code for the `{ "enforceForJSX": true }` option:
 
-::: correct
+::: correct { "parserOptions": { "ecmaFeatures": { "jsx": true } } }
 
 ```jsx
 /*eslint no-unused-expressions: ["error", { "enforceForJSX": true }]*/
 
-var myComponentPartial = <MyComponent />;
+const myComponentPartial = <MyComponent />;
 
-var myFragment = <></>;
+const myFragment = <></>;
+```
+
+:::
+
+### ignoreDirectives
+
+When set to `false` (default), this rule reports directives (like `"use strict"`) as unused expressions when linting with `ecmaVersion: 3`. This default behavior exists because ES3 environments do not formally support directives, meaning such strings are effectively unused expressions in that specific context.
+
+Set this option to `true` to prevent directives from being reported as unused, even when `ecmaVersion: 3` is specified. This option is primarily useful for projects that need to maintain a single codebase containing directives while supporting both older ES3 environments and modern (ES5+) environments.
+
+**Note:** In ES5+ environments, directives are always ignored regardless of this setting.
+
+Examples of **incorrect** code for the `{ "ignoreDirectives": false }` option and `ecmaVersion: 3`:
+
+::: incorrect { "ecmaVersion": 3, "sourceType": "script" }
+
+```js
+/*eslint no-unused-expressions: ["error", { "ignoreDirectives": false }]*/
+
+"use strict";
+"use asm"
+"use stricter";
+"use babel"
+"any other strings like this in the directive prologue";
+"this is still the directive prologue";
+
+function foo() {
+    "bar";
+}
+```
+
+:::
+
+Examples of **correct** code for the `{ "ignoreDirectives": true }` option and `ecmaVersion: 3`:
+
+::: correct { "ecmaVersion": 3, "sourceType": "script" }
+
+```js
+/*eslint no-unused-expressions: ["error", { "ignoreDirectives": true }]*/
+
+"use strict";
+"use asm"
+"use stricter";
+"use babel"
+"any other strings like this in the directive prologue";
+"this is still the directive prologue";
+
+function foo() {
+    "bar";
+}
+```
+
+:::
+
+### TypeScript Support
+
+This rule supports TypeScript-specific expressions and follows these guidelines:
+
+1. Directives (like `'use strict'`) are allowed in module and namespace declarations
+2. Type-related expressions are treated as unused if their wrapped value expressions are unused:
+   * Type assertions (`x as number`, `<number>x`)
+   * Non-null assertions (`x!`)
+   * Type instantiations (`Set<number>`)
+
+**Note**: Although type expressions never have runtime side effects (e.g., `x!` is equivalent to `x` at runtime), they can be used to assert types for testing purposes.
+
+Examples of **correct** code for this rule when using TypeScript:
+
+::: correct
+
+```ts
+/* eslint no-unused-expressions: "error" */
+
+// Type expressions wrapping function calls are allowed
+function getSet() {
+    return Set;
+}
+getSet()<number>;
+getSet() as Set<unknown>;
+getSet()!;
+
+// Directives in modules and namespaces
+module Foo {
+    'use strict';
+    'hello world';
+}
+
+namespace Bar {
+    'use strict';
+    export class Baz {}
+}
+```
+
+:::
+
+Examples of **incorrect** code for this rule when using TypeScript:
+
+::: incorrect
+
+```ts
+/* eslint no-unused-expressions: "error" */
+
+// Standalone type expressions
+Set<number>;
+1 as number;
+window!;
+
+// Expressions inside namespaces
+namespace Bar {
+    123;
+}
 ```
 
 :::

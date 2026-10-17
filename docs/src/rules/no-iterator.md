@@ -1,10 +1,9 @@
 ---
 title: no-iterator
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators
-- https://kangax.github.io/es5-compat-table/es6/#Iterators
+- https://compat-table.github.io/compat-table/non-standard/#test-__iterator__
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features#Object_methods
 ---
 
@@ -49,7 +48,11 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-iterator: "error"*/
 
-var __iterator__ = foo; // Not using the `__iterator__` property.
+const __iterator__ = foo; // Not using the `__iterator__` property.
 ```
 
 :::
+
+## Options
+
+This rule has no options.

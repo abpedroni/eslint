@@ -1,6 +1,5 @@
 ---
 title: no-control-regex
-layout: doc
 rule_type: problem
 related_rules:
 - no-div-regex
@@ -22,7 +21,7 @@ The following elements of regular expression patterns are considered possible er
 * Unicode code point escapes from `\u{0}` to `\u{1F}`.
 * Unescaped raw characters from U+0000 to U+001F.
 
-Control escapes such as `\t` and `\n` are allowed by this rule.
+Control escapes such as `\t` and `\n` are allowed by this rule. Control letter escapes such as `\cA`-`\cZ` (and `\ca`-`\cz`) are also allowed, since writing a control character this way makes the intent to match a control character explicit, unlike the hexadecimal, Unicode, and raw forms above, which can obscure that intent.
 
 Examples of **incorrect** code for this rule:
 
@@ -31,13 +30,13 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-control-regex: "error"*/
 
-var pattern1 = /\x00/;
-var pattern2 = /\x0C/;
-var pattern3 = /\x1F/;
-var pattern4 = /\u000C/;
-var pattern5 = /\u{C}/u;
-var pattern6 = new RegExp("\x0C"); // raw U+000C character in the pattern
-var pattern7 = new RegExp("\\x0C"); // \x0C pattern
+const pattern1 = /\x00/;
+const pattern2 = /\x0C/;
+const pattern3 = /\x1F/;
+const pattern4 = /\u000C/;
+const pattern5 = /\u{C}/u;
+const pattern6 = new RegExp("\x0C"); // raw U+000C character in the pattern
+const pattern7 = new RegExp("\\x0C"); // \x0C pattern
 ```
 
 :::
@@ -49,17 +48,22 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-control-regex: "error"*/
 
-var pattern1 = /\x20/;
-var pattern2 = /\u0020/;
-var pattern3 = /\u{20}/u;
-var pattern4 = /\t/;
-var pattern5 = /\n/;
-var pattern6 = new RegExp("\x20");
-var pattern7 = new RegExp("\\t");
-var pattern8 = new RegExp("\\n");
+const pattern1 = /\x20/;
+const pattern2 = /\u0020/;
+const pattern3 = /\u{20}/u;
+const pattern4 = /\t/;
+const pattern5 = /\n/;
+const pattern6 = new RegExp("\x20");
+const pattern7 = new RegExp("\\t");
+const pattern8 = new RegExp("\\n");
+const pattern9 = /\cJ/; // control letter escape for U+000A
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## Known Limitations
 

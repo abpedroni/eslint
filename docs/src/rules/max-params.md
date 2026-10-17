@@ -1,11 +1,9 @@
 ---
 title: max-params
-layout: doc
 rule_type: suggestion
 related_rules:
 - complexity
 - max-depth
-- max-len
 - max-lines
 - max-lines-per-function
 - max-nested-callbacks
@@ -30,8 +28,10 @@ This rule enforces a maximum number of parameters allowed in function definition
 This rule has a number or object option:
 
 * `"max"` (default `3`) enforces a maximum number of parameters in function definitions
+* `"countThis"` (default `"except-void"`, possible values `"always"`, `"never"` or `"except-void"`) whether to count a `this` declaration (TypeScript only)
 
 **Deprecated:** The object property `maximum` is deprecated; please use the object property `max` instead.
+**Deprecated:** The object property `countVoidThis` is deprecated; please use `countThis: "except-void"` instead of `countVoidThis: false`, and `countThis: "always"` instead of `countVoidThis: true`.
 
 ### max
 
@@ -41,13 +41,12 @@ Examples of **incorrect** code for this rule with the default `{ "max": 3 }` opt
 
 ```js
 /*eslint max-params: ["error", 3]*/
-/*eslint-env es6*/
 
-function foo (bar, baz, qux, qxx) {
+function foo1 (bar, baz, qux, qxx) {
     doSomething();
 }
 
-let foo = (bar, baz, qux, qxx) => {
+let foo2 = (bar, baz, qux, qxx) => {
     doSomething();
 };
 ```
@@ -60,15 +59,75 @@ Examples of **correct** code for this rule with the default `{ "max": 3 }` optio
 
 ```js
 /*eslint max-params: ["error", 3]*/
-/*eslint-env es6*/
 
-function foo (bar, baz, qux) {
+function foo1 (bar, baz, qux) {
     doSomething();
 }
 
-let foo = (bar, baz, qux) => {
+let foo2 = (bar, baz, qux) => {
     doSomething();
 };
+```
+
+:::
+
+### countThis (TypeScript only)
+
+This rule has a TypeScript-specific option `countThis` that allows you to count a `this` declaration.
+Valid values are:
+
+* `"always"`: any `this` type annotation will count as a parameter
+* `"never"`: `this` won't ever be counted
+* `"except-void"`: `this` will be counted only if its type is not `void`. Equivalent to the deprecated `countVoidThis: false`.
+
+Examples of **correct** TypeScript code for this rule:
+
+:::correct
+
+```ts
+/*eslint max-params: ["error", { "max": 2, "countThis": "except-void" }]*/
+
+function hasNoThis(this: void, first: string, second: string) {
+	// ...
+}
+```
+
+:::
+
+:::correct
+
+```ts
+/*eslint max-params: ["error", { "max": 2, "countThis": "never" }]*/
+
+function hasThis(this: unknown[], first: string, second: string) {
+	// ...
+}
+```
+
+:::
+
+Examples of **incorrect** TypeScript code for this rule:
+
+:::incorrect
+
+```ts
+/*eslint max-params: ["error", { "max": 2, "countThis": "always" }]*/
+
+function hasNoThis(this: void, first: string, second: string) {
+	// ...
+}
+```
+
+:::
+
+:::incorrect
+
+```ts
+/*eslint max-params: ["error", { "max": 2, "countThis": "except-void" }]*/
+
+function hasThis(this: unknown[], first: string, second: string) {
+	// ...
+}
 ```
 
 :::

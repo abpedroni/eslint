@@ -1,14 +1,10 @@
 ---
 title: quote-props
-layout: doc
 rule_type: suggestion
 further_reading:
-- https://kangax.github.io/compat-table/es5/#Reserved_words_as_property_names
+- https://compat-table.github.io/compat-table/es5/#test-Object/array_literal_extensions_Reserved_words_as_property_names
 - https://mathiasbynens.be/notes/javascript-properties
 ---
-
-
-
 Object literal property names can be defined in two ways: using literals or using strings. For example, these two objects are equivalent:
 
 ```js
@@ -84,7 +80,6 @@ Examples of **correct** code for this rule with the default `"always"` option:
 
 ```js
 /*eslint quote-props: ["error", "always"]*/
-/*eslint-env es6*/
 
 var object1 = {
     "foo": "bar",
@@ -132,7 +127,6 @@ Examples of **correct** code for this rule with the `"as-needed"` option:
 
 ```js
 /*eslint quote-props: ["error", "as-needed"]*/
-/*eslint-env es6*/
 
 var object1 = {
     "a-b": 0,

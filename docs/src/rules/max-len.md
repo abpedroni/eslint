@@ -1,6 +1,5 @@
 ---
 title: max-len
-layout: doc
 rule_type: layout
 related_rules:
 - complexity
@@ -9,8 +8,6 @@ related_rules:
 - max-params
 - max-statements
 ---
-
-
 Very long lines of code in any language can be difficult to read. In order to aid in readability and maintainability many coders have developed a convention to limit lines of code to X number of characters (traditionally 80 characters).
 
 ```js
@@ -23,7 +20,7 @@ This rule enforces a maximum line length to increase code readability and mainta
 
 ## Options
 
-This rule has a number or object option:
+This rule can have up to two numbers as positional arguments (for `code` and `tabWidth` options), followed by an object option (provided positional arguments have priority):
 
 * `"code"` (default `80`) enforces a maximum line length
 * `"tabWidth"` (default `4`) specifies the character width for tab characters
@@ -70,30 +67,36 @@ var foo = {
 
 Examples of **incorrect** code for this rule with the default `{ "tabWidth": 4 }` option:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD010 -->
 ::: incorrect
 
 ```js
 /*eslint max-len: ["error", { "code": 80, "tabWidth": 4 }]*/
 
-\t  \t  var foo = { "bar": "This is a bar.", "baz": { "qux": "This is a qux" } };
+		var foo = { "bar": "This is a bar.", "baz": { "qux": "This is a qux" } };
 ```
 
 :::
+<!-- markdownlint-restore -->
 
 Examples of **correct** code for this rule with the default `{ "tabWidth": 4 }` option:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD010 -->
 ::: correct
 
 ```js
 /*eslint max-len: ["error", { "code": 80, "tabWidth": 4 }]*/
 
-\t  \t  var foo = {
-\t  \t  \t  \t  "bar": "This is a bar.",
-\t  \t  \t  \t  "baz": { "qux": "This is a qux" }
-\t  \t  };
+		var foo = {
+				"bar": "This is a bar.",
+				"baz": { "qux": "This is a qux" }
+		};
 ```
 
 :::
+<!-- markdownlint-restore -->
 
 ### comments
 
@@ -204,7 +207,8 @@ Examples of **correct** code for this rule with the `ignorePattern` option:
 ::: correct
 
 ```js
-/*eslint max-len: ["error", { "ignorePattern": "^\\s*var\\s.+=\\s*require\\s*\\(" }]*/
+/*eslint max-len:
+["error", { "ignorePattern": "^\\s*var\\s.+=\\s*require\\s*\\(" }]*/
 
 var dep = require('really/really/really/really/really/really/really/really/long/module');
 ```

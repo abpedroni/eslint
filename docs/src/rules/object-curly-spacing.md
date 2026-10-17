@@ -1,6 +1,5 @@
 ---
 title: object-curly-spacing
-layout: doc
 rule_type: layout
 related_rules:
 - array-bracket-spacing
@@ -8,9 +7,6 @@ related_rules:
 - computed-property-spacing
 - space-in-parens
 ---
-
-
-
 While formatting preferences are very personal, a number of style guides require
 or disallow spaces between curly braces in the following situations:
 

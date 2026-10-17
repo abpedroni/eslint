@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-div-regex"),
-    { RuleTester } = require("../../../lib/rule-tester");
+	RuleTester = require("../../../lib/rule-tester/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -19,15 +19,23 @@ const rule = require("../../../lib/rules/no-div-regex"),
 const ruleTester = new RuleTester();
 
 ruleTester.run("no-div-regex", rule, {
-    valid: [
-        "var f = function() { return /foo/ig.test('bar'); };",
-        "var f = function() { return /\\=foo/; };"
-    ],
-    invalid: [
-        {
-            code: "var f = function() { return /=foo/; };",
-            output: "var f = function() { return /[=]foo/; };",
-            errors: [{ messageId: "unexpected", type: "Literal" }]
-        }
-    ]
+	valid: [
+		"var f = function() { return /foo/ig.test('bar'); };",
+		"var f = function() { return /\\=foo/; };",
+	],
+	invalid: [
+		{
+			code: "var f = function() { return /=foo/; };",
+			output: "var f = function() { return /[=]foo/; };",
+			errors: [
+				{
+					messageId: "unexpected",
+					line: 1,
+					column: 29,
+					endLine: 1,
+					endColumn: 35,
+				},
+			],
+		},
+	],
 });

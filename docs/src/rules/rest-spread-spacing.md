@@ -1,13 +1,9 @@
 ---
 title: rest-spread-spacing
-layout: doc
 rule_type: layout
 further_reading:
 - https://github.com/tc39/proposal-object-rest-spread
 ---
-
-
-
 ES2015 introduced the rest and spread operators, which expand an iterable structure into its individual parts. Some examples of their usage are as follows:
 
 ```js
@@ -53,13 +49,13 @@ This rule aims to enforce consistent spacing between rest and spread operators a
 
 ```json
 {
-    "parserOptions": {
+    "languageOptions": {
         "ecmaVersion": 2018
     }
 }
 ```
 
-Please read the user guide's section on [configuring parser options](/docs/user-guide/configuring#specifying-parser-options) to learn more.
+Please read the user guide's section on [configure language options](../use/configure/language-options#specify-javascript-options) to learn more.
 
 ## Options
 
@@ -86,8 +82,8 @@ Examples of **incorrect** code for this rule with `"never"`:
 ```js
 /*eslint rest-spread-spacing: ["error", "never"]*/
 
-fn(... args)
-[... arr, 4, 5, 6]
+fn(... args);
+[... arr, 4, 5, 6];
 let [a, b, ... arr] = [1, 2, 3, 4, 5];
 function fn(... args) { console.log(args); }
 let { x, y, ... z } = { x: 1, y: 2, a: 3, b: 4 };
@@ -103,8 +99,8 @@ Examples of **correct** code for this rule with `"never"`:
 ```js
 /*eslint rest-spread-spacing: ["error", "never"]*/
 
-fn(...args)
-[...arr, 4, 5, 6]
+fn(...args);
+[...arr, 4, 5, 6];
 let [a, b, ...arr] = [1, 2, 3, 4, 5];
 function fn(...args) { console.log(args); }
 let { x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 };
@@ -128,8 +124,8 @@ Examples of **incorrect** code for this rule with `"always"`:
 ```js
 /*eslint rest-spread-spacing:["error", "always"]*/
 
-fn(...args)
-[...arr, 4, 5, 6]
+fn(...args);
+[...arr, 4, 5, 6];
 let [a, b, ...arr] = [1, 2, 3, 4, 5];
 function fn(...args) { console.log(args); }
 let { x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 };
@@ -145,8 +141,8 @@ Examples of **correct** code for this rule with `"always"`:
 ```js
 /*eslint rest-spread-spacing: ["error", "always"]*/
 
-fn(... args)
-[... arr, 4, 5, 6]
+fn(... args);
+[... arr, 4, 5, 6];
 let [a, b, ... arr] = [1, 2, 3, 4, 5];
 function fn(... args) { console.log(args); }
 let { x, y, ... z } = { x: 1, y: 2, a: 3, b: 4 };

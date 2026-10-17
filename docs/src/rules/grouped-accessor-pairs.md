@@ -1,6 +1,5 @@
 ---
 title: grouped-accessor-pairs
-layout: doc
 rule_type: suggestion
 related_rules:
 - accessor-pairs
@@ -18,7 +17,7 @@ A getter and setter for the same property don't necessarily have to be defined a
 For example, the following statements would create the same object:
 
 ```js
-var o = {
+const o = {
     get a() {
         return this.val;
     },
@@ -28,7 +27,7 @@ var o = {
     b: 1
 };
 
-var o = {
+const o1 = {
     get a() {
         return this.val;
     },
@@ -58,7 +57,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint grouped-accessor-pairs: "error"*/
 
-var foo = {
+const foo = {
     get a() {
         return this.val;
     },
@@ -68,7 +67,7 @@ var foo = {
     }
 };
 
-var bar = {
+const bar = {
     set b(value) {
         this.val = value;
     },
@@ -108,7 +107,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint grouped-accessor-pairs: "error"*/
 
-var foo = {
+const foo = {
     get a() {
         return this.val;
     },
@@ -118,7 +117,7 @@ var foo = {
     b: 1
 };
 
-var bar = {
+const bar = {
     set b(value) {
         this.val = value;
     },
@@ -153,11 +152,14 @@ const Bar = class {
 
 ## Options
 
-This rule has a string option:
-
+This rule has a primary string and an optional secondary object option.
+The string option specifies the order:
 * `"anyOrder"` (default) does not enforce order.
 * `"getBeforeSet"` if a property has both getter and setter, requires the getter to be defined before the setter.
 * `"setBeforeGet"` if a property has both getter and setter, requires the setter to be defined before the getter.
+
+The optional object option allows opting-in to check additional object-likes:
+* `enforceForTSTypes`: also check TypeScript types (interfaces and type literals)
 
 ### getBeforeSet
 
@@ -168,7 +170,7 @@ Examples of **incorrect** code for this rule with the `"getBeforeSet"` option:
 ```js
 /*eslint grouped-accessor-pairs: ["error", "getBeforeSet"]*/
 
-var foo = {
+const foo = {
     set a(value) {
         this.val = value;
     },
@@ -205,7 +207,7 @@ Examples of **correct** code for this rule with the `"getBeforeSet"` option:
 ```js
 /*eslint grouped-accessor-pairs: ["error", "getBeforeSet"]*/
 
-var foo = {
+const foo = {
     get a() {
         return this.val;
     },
@@ -244,7 +246,7 @@ Examples of **incorrect** code for this rule with the `"setBeforeGet"` option:
 ```js
 /*eslint grouped-accessor-pairs: ["error", "setBeforeGet"]*/
 
-var foo = {
+const foo = {
     get a() {
         return this.val;
     },
@@ -281,7 +283,7 @@ Examples of **correct** code for this rule with the `"setBeforeGet"` option:
 ```js
 /*eslint grouped-accessor-pairs: ["error", "setBeforeGet"]*/
 
-var foo = {
+const foo = {
     set a(value) {
         this.val = value;
     },
@@ -310,6 +312,49 @@ const Bar = class {
 ```
 
 :::
+### enforceForTSTypes
+
+Examples of **incorrect** code for this rule with `["anyOrder", { enforceForTSTypes: true }]`:
+
+::: incorrect
+
+```ts
+/*eslint grouped-accessor-pairs: ["error", "anyOrder", { enforceForTSTypes: true }] */
+
+interface I {
+    get a(): string,
+    between: true,
+    set a(value: string): void
+}
+
+type T = {
+    get a(): string,
+    between: true,
+    set a(value: string): void
+};
+```
+
+:::
+
+Examples of **correct** code for this rule with `["anyOrder", { enforceForTSTypes: true }]`:
+
+::: correct
+
+```ts
+/*eslint grouped-accessor-pairs: ["error", "anyOrder", { enforceForTSTypes: true }] */
+
+interface I {
+    get a(): string,
+    set a(value: string): void,
+}
+
+type T = {
+    set a(value: string): void,
+    get a(): string,
+};
+```
+
+:::
 
 ## Known Limitations
 
@@ -319,10 +364,10 @@ might require or miss to require grouping or order for getters/setters that have
 ```js
 /*eslint grouped-accessor-pairs: "error"*/
 
-var a = 1;
+let a = 1;
 
 // false warning (false positive)
-var foo = {
+const foo = {
     get [a++]() {
         return this.val;
     },
@@ -333,7 +378,7 @@ var foo = {
 };
 
 // missed warning (false negative)
-var bar = {
+const bar = {
     get [++a]() {
         return this.val;
     },

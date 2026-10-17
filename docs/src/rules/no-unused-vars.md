@@ -1,7 +1,9 @@
 ---
 title: no-unused-vars
-layout: doc
 rule_type: problem
+related_rules:
+- no-unassigned-vars
+- no-useless-assignment
 ---
 
 
@@ -15,11 +17,11 @@ This rule is aimed at eliminating unused variables, functions, and function para
 A variable `foo` is considered to be used if any of the following are true:
 
 * It is called (`foo()`) or constructed (`new foo()`)
-* It is read (`var bar = foo`)
+* It is read (`let bar = foo`)
 * It is passed into a function as an argument (`doSomething(foo)`)
 * It is read inside of a function that is passed to another function (`doSomething(function() { foo(); })`)
 
-A variable is *not* considered to be used if it is only ever declared (`var foo = 5`) or assigned to (`foo = 7`).
+A variable is *not* considered to be used if it is only ever declared (`let foo = 5`) or assigned to (`foo = 7`).
 
 Examples of **incorrect** code for this rule:
 
@@ -32,14 +34,14 @@ Examples of **incorrect** code for this rule:
 // It checks variables you have defined as global
 some_unused_var = 42;
 
-var x;
+let x;
 
 // Write-only variables are not considered as used.
-var y = 10;
+let y = 10;
 y = 5;
 
 // A read for a modification of itself is not considered as used.
-var z = 0;
+let z = 0;
 z = z + 1;
 
 // By default, unused arguments cause warnings.
@@ -57,6 +59,7 @@ function fact(n) {
 function getY([x, y]) {
     return y;
 }
+getY(["a", "b"]);
 ```
 
 :::
@@ -68,7 +71,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-unused-vars: "error"*/
 
-var x = 10;
+const x = 10;
 alert(x);
 
 // foo is considered used here
@@ -90,6 +93,7 @@ myFunc = setTimeout(function() {
 function getY([, y]) {
     return y;
 }
+getY(["a", "b"]);
 ```
 
 :::
@@ -100,17 +104,23 @@ In environments outside of CommonJS or ECMAScript modules, you may use `var` to 
 
 Note that `/* exported */` has no effect for any of the following:
 
-* when the environment is `node` or `commonjs`
-* when `parserOptions.sourceType` is `module`
-* when `ecmaFeatures.globalReturn` is `true`
+* when `languageOptions.sourceType` is `module` (default) or `commonjs`
+* when `languageOptions.parserOptions.ecmaFeatures.globalReturn` is `true`
 
 The line comment `// exported variableName` will not work as `exported` is not line-specific.
 
-Examples of **correct** code for `/* exported variableName */` operation:
+```js
+/* exported global_var */
 
-::: correct
+var global_var = 42;
+```
+
+Examples of **correct** code for `/* exported variableName */` operation with `no-unused-vars`:
+
+::: correct { "sourceType": "script" }
 
 ```js
+/*eslint no-unused-vars: "error"*/
 /* exported global_var */
 
 var global_var = 42;
@@ -122,12 +132,19 @@ var global_var = 42;
 
 This rule takes one argument which can be a string or an object. The string settings are the same as those of the `vars` property (explained below).
 
-By default this rule is enabled with `all` option for variables and `after-used` for arguments.
+By default this rule is enabled with `all` option for caught errors and variables, and `after-used` for arguments.
 
 ```json
 {
     "rules": {
-        "no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }]
+        "no-unused-vars": ["error", {
+            "vars": "all",
+            "args": "after-used",
+            "caughtErrors": "all",
+            "ignoreRestSiblings": false,
+            "ignoreUsingDeclarations": false,
+            "reportUsedIgnorePattern": false
+        }]
     }
 }
 ```
@@ -136,8 +153,8 @@ By default this rule is enabled with `all` option for variables and `after-used`
 
 The `vars` option has two settings:
 
-* `all` checks all variables for usage, including those in the global scope. This is the default setting.
-* `local` checks only that locally-declared variables are used but will allow global variables to be unused.
+* `"all"` checks all variables for usage, including those in the global scope. However, it excludes variables targeted by other options like `args` and `caughtErrors`. This is the default setting.
+* `"local"` allows variables in the global scope to be unused.
 
 #### vars: local
 
@@ -154,9 +171,29 @@ some_unused_var = 42;
 
 :::
 
+Examples of **correct** code for the `{ "vars": "local" }` option with `"languageOptions": { "sourceType": "script" }`:
+
+::: correct { "sourceType": "script" }
+
+```js
+/*eslint no-unused-vars: ["error", { "vars": "local" }]*/
+
+const foo = 42;
+
+let bar;
+
+let baz = 42;
+
+var qux;
+
+var quux = 42;
+```
+
+:::
+
 ### varsIgnorePattern
 
-The `varsIgnorePattern` option specifies exceptions not to check for usage: variables whose names match a regexp pattern. For example, variables whose names contain `ignored` or `Ignored`.
+The `varsIgnorePattern` option specifies exceptions not to check for usage: variables whose names match a regexp pattern. For example, variables whose names contain `ignored` or `Ignored`. However, it excludes variables targeted by other options like `argsIgnorePattern` and `caughtErrorsIgnorePattern`.
 
 Examples of **correct** code for the `{ "varsIgnorePattern": "[iI]gnored" }` option:
 
@@ -165,8 +202,8 @@ Examples of **correct** code for the `{ "varsIgnorePattern": "[iI]gnored" }` opt
 ```js
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "[iI]gnored" }]*/
 
-var firstVarIgnored = 1;
-var secondVar = 2;
+const firstVarIgnored = 1;
+const secondVar = 2;
 console.log(secondVar);
 ```
 
@@ -248,25 +285,6 @@ Examples of **correct** code for the `{ "args": "none" }` option:
 
 :::
 
-### ignoreRestSiblings
-
-The `ignoreRestSiblings` option is a boolean (default: `false`). Using a [Rest Property](https://github.com/tc39/proposal-object-rest-spread) it is possible to "omit" properties from an object, but by default the sibling properties are marked as "unused". With this option enabled the rest property's siblings are ignored.
-
-Examples of **correct** code for the `{ "ignoreRestSiblings": true }` option:
-
-::: correct
-
-```js
-/*eslint no-unused-vars: ["error", { "ignoreRestSiblings": true }]*/
-// 'foo' and 'bar' were ignored because they have a rest property sibling.
-var { foo, ...coords } = data;
-
-var bar;
-({ bar, ...coords } = data);
-```
-
-:::
-
 ### argsIgnorePattern
 
 The `argsIgnorePattern` option specifies exceptions not to check for usage: arguments whose names match a regexp pattern. For example, variables whose names begin with an underscore.
@@ -282,6 +300,75 @@ function foo(x, _y) {
     return x + 1;
 }
 foo();
+```
+
+:::
+
+### caughtErrors
+
+The `caughtErrors` option is used for `catch` block arguments validation.
+
+It has two settings:
+
+* `all` - all named arguments must be used. This is the default setting.
+* `none` - do not check error objects.
+
+#### caughtErrors: all
+
+Not specifying this option is equivalent of assigning it to `all`.
+
+Examples of **incorrect** code for the `{ "caughtErrors": "all" }` option:
+
+::: incorrect
+
+```js
+/*eslint no-unused-vars: ["error", { "caughtErrors": "all" }]*/
+
+// 1 error
+// "err" is defined but never used
+try {
+    //...
+} catch (err) {
+    console.error("errors");
+}
+```
+
+:::
+
+#### caughtErrors: none
+
+Examples of **correct** code for the `{ "caughtErrors": "none" }` option:
+
+::: correct
+
+```js
+/*eslint no-unused-vars: ["error", { "caughtErrors": "none" }]*/
+
+try {
+    //...
+} catch (err) {
+    console.error("errors");
+}
+```
+
+:::
+
+### caughtErrorsIgnorePattern
+
+The `caughtErrorsIgnorePattern` option specifies exceptions not to check for usage: catch arguments whose names match a regexp pattern. For example, variables whose names begin with a string 'ignore'.
+
+Examples of **correct** code for the `{ "caughtErrorsIgnorePattern": "^ignore" }` option:
+
+::: correct
+
+```js
+/*eslint no-unused-vars: ["error", { "caughtErrors": "all", "caughtErrorsIgnorePattern": "^ignore" }]*/
+
+try {
+    //...
+} catch (ignoreErr) {
+    console.error("errors");
+}
 ```
 
 :::
@@ -327,71 +414,133 @@ p;
 
 :::
 
-### caughtErrors
+### ignoreRestSiblings
 
-The `caughtErrors` option is used for `catch` block arguments validation.
+The `ignoreRestSiblings` option is a boolean (default: `false`). Using a [Rest Property](https://github.com/tc39/proposal-object-rest-spread) it is possible to "omit" properties from an object, but by default the sibling properties are marked as "unused". With this option enabled the rest property's siblings are ignored.
 
-It has two settings:
-
-* `none` - do not check error objects. This is the default setting.
-* `all` - all named arguments must be used.
-
-#### caughtErrors: none
-
-Not specifying this rule is equivalent of assigning it to `none`.
-
-Examples of **correct** code for the `{ "caughtErrors": "none" }` option:
+Examples of **correct** code for the `{ "ignoreRestSiblings": true }` option:
 
 ::: correct
 
 ```js
-/*eslint no-unused-vars: ["error", { "caughtErrors": "none" }]*/
+/*eslint no-unused-vars: ["error", { "ignoreRestSiblings": true }]*/
 
-try {
-    //...
-} catch (err) {
-    console.error("errors");
-}
+// 'foo' and 'bar' were ignored because they have a rest property sibling.
+const { foo, ...rest } = data;
+console.log(rest);
+
+// OR
+
+let bar;
+({ bar, ...rest } = data);
 ```
 
 :::
 
-#### caughtErrors: all
+### ignoreClassWithStaticInitBlock
 
-Examples of **incorrect** code for the `{ "caughtErrors": "all" }` option:
+The `ignoreClassWithStaticInitBlock` option is a boolean (default: `false`). Static initialization blocks allow you to initialize static variables and execute code during the evaluation of a class definition, meaning the static block code is executed without creating a new instance of the class. When set to `true`, this option ignores classes containing static initialization blocks.
+
+Examples of **incorrect** code for the `{ "ignoreClassWithStaticInitBlock": true }` option
 
 ::: incorrect
 
 ```js
-/*eslint no-unused-vars: ["error", { "caughtErrors": "all" }]*/
+/*eslint no-unused-vars: ["error", { "ignoreClassWithStaticInitBlock": true }]*/
 
-// 1 error
-// "err" is defined but never used
-try {
-    //...
-} catch (err) {
-    console.error("errors");
+class Foo {
+    static myProperty = "some string";
+    static mymethod() {
+        return "some string";
+    }
+}
+
+class Bar {
+    static {
+        let baz; // unused variable
+    }
 }
 ```
 
 :::
 
-### caughtErrorsIgnorePattern
-
-The `caughtErrorsIgnorePattern` option specifies exceptions not to check for usage: catch arguments whose names match a regexp pattern. For example, variables whose names begin with a string 'ignore'.
-
-Examples of **correct** code for the `{ "caughtErrorsIgnorePattern": "^ignore" }` option:
+Examples of **correct** code for the `{ "ignoreClassWithStaticInitBlock": true }` option
 
 ::: correct
 
 ```js
-/*eslint no-unused-vars: ["error", { "caughtErrorsIgnorePattern": "^ignore" }]*/
+/*eslint no-unused-vars: ["error", { "ignoreClassWithStaticInitBlock": true }]*/
 
-try {
-    //...
-} catch (ignoreErr) {
-    console.error("errors");
+class Foo {
+    static {
+        let bar = "some string";
+
+        console.log(bar);
+    }
 }
+```
+
+:::
+
+### ignoreUsingDeclarations
+
+The `ignoreUsingDeclarations` option is a boolean (default: `false`). Explicit resource management allows automatic teardown of disposables by calling `Symbol.dispose` or `Symbol.asyncDispose` method implicitly at the end of the variable's scope. When this option is set to `true`, this rule ignores variables declared with `using` or `await using`.
+
+Examples of **incorrect** code for the `{ "ignoreUsingDeclarations": true }` option:
+
+::: incorrect
+
+```js
+/*eslint no-unused-vars: ["error", { "ignoreUsingDeclarations": true }]*/
+const resource = getResource();
+```
+
+:::
+
+Examples of **correct** code for the `{ "ignoreUsingDeclarations": true }` option:
+
+::: correct
+
+```js
+/*eslint no-unused-vars: ["error", { "ignoreUsingDeclarations": true }]*/
+
+using syncResource = getSyncResource();
+await using asyncResource = getAsyncResource();
+```
+
+:::
+
+### reportUsedIgnorePattern
+
+The `reportUsedIgnorePattern` option is a boolean (default: `false`).
+Using this option will report variables that match any of the valid ignore
+pattern options (`varsIgnorePattern`, `argsIgnorePattern`, `caughtErrorsIgnorePattern`, or
+`destructuredArrayIgnorePattern`) if they have been used.
+
+Examples of **incorrect** code for the `{ "reportUsedIgnorePattern": true }` option:
+
+::: incorrect
+
+```js
+/*eslint no-unused-vars: ["error", { "reportUsedIgnorePattern": true, "varsIgnorePattern": "[iI]gnored" }]*/
+
+const firstVarIgnored = 1;
+const secondVar = 2;
+console.log(firstVarIgnored, secondVar);
+```
+
+:::
+
+Examples of **correct** code for the `{ "reportUsedIgnorePattern": true }` option:
+
+::: correct
+
+```js
+/*eslint no-unused-vars: ["error", { "reportUsedIgnorePattern": true, "varsIgnorePattern": "[iI]gnored" }]*/
+
+const firstVar = 1;
+const secondVar = 2;
+console.log(firstVar, secondVar);
 ```
 
 :::

@@ -1,6 +1,5 @@
 ---
 title: prefer-named-capture-group
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-invalid-regexp
@@ -54,6 +53,10 @@ foo.exec('bar').groups.id; // Retrieve the group result.
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

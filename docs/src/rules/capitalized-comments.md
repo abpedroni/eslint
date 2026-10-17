@@ -1,6 +1,5 @@
 ---
 title: capitalized-comments
-layout: doc
 rule_type: suggestion
 ---
 
@@ -34,6 +33,7 @@ Examples of **correct** code for this rule:
 :::correct
 
 ```js
+/* eslint capitalized-comments: error */
 
 // Capitalized comment
 
@@ -41,25 +41,27 @@ Examples of **correct** code for this rule:
 
 // 丈 Non-Latin character at beginning of comment
 
-/* eslint semi:off */
-/* eslint-env node */
-/* eslint-disable */
-/* eslint-enable */
 /* istanbul ignore next */
 /* jscs:enable */
 /* jshint asi:true */
 /* global foo */
 /* globals foo */
 /* exported myVar */
-// eslint-disable-line
-// eslint-disable-next-line
 // https://github.com
+
+/* eslint semi:2 */
+/* eslint-disable */
+foo
+/* eslint-enable */
+// eslint-disable-next-line
+baz
+bar // eslint-disable-line
 
 ```
 
 :::
 
-### Options
+## Options
 
 This rule has two options: a string value `"always"` or `"never"` which determines whether capitalization of the first word of a comment should be required or forbidden, and optionally an object containing more configuration parameters for the rule.
 
@@ -85,7 +87,7 @@ Here is an example configuration:
 }
 ```
 
-#### `"always"`
+### `"always"`
 
 Using the `"always"` option means that this rule will report any comments which start with a lowercase letter. This is the default configuration for this rule.
 
@@ -117,25 +119,27 @@ Examples of **correct** code for this rule:
 
 // 丈 Non-Latin character at beginning of comment
 
-/* eslint semi:off */
-/* eslint-env node */
-/* eslint-disable */
-/* eslint-enable */
 /* istanbul ignore next */
 /* jscs:enable */
 /* jshint asi:true */
 /* global foo */
 /* globals foo */
 /* exported myVar */
-// eslint-disable-line
-// eslint-disable-next-line
 // https://github.com
+
+/* eslint semi:2 */
+/* eslint-disable */
+foo
+/* eslint-enable */
+// eslint-disable-next-line
+baz
+bar // eslint-disable-line
 
 ```
 
 :::
 
-#### `"never"`
+### `"never"`
 
 Using the `"never"` option means that this rule will report any comments which start with an uppercase letter.
 
@@ -169,7 +173,7 @@ Examples of **correct** code with the `"never"` option:
 
 :::
 
-#### `ignorePattern`
+### `ignorePattern`
 
 The `ignorePattern` object takes a string value, which is used as a regular expression applied to the first word of a comment.
 
@@ -188,7 +192,7 @@ function foo() {
 
 :::
 
-#### `ignoreInlineComments`
+### `ignoreInlineComments`
 
 Setting the `ignoreInlineComments` option to `true` means that comments in the middle of code (with a token on the same line as the beginning of the comment, and another token on the same line as the end of the comment) will not be reported by this rule.
 
@@ -206,7 +210,7 @@ function foo(/* ignored */ a) {
 
 :::
 
-#### `ignoreConsecutiveComments`
+### `ignoreConsecutiveComments`
 
 If the `ignoreConsecutiveComments` option is set to `true`, then comments which otherwise violate the rule will not be reported as long as they immediately follow another comment. This can be applied more than once.
 
@@ -217,10 +221,12 @@ Examples of **correct** code with `ignoreConsecutiveComments` set to `true`:
 ```js
 /* eslint capitalized-comments: ["error", "always", { "ignoreConsecutiveComments": true }] */
 
+foo();
 // This comment is valid since it has the correct capitalization.
 // this comment is ignored since it follows another comment,
 // and this one as well because it follows yet another comment.
 
+bar();
 /* Here is a block comment which has the correct capitalization, */
 /* but this one is ignored due to being consecutive; */
 /*
@@ -237,13 +243,14 @@ Examples of **incorrect** code with `ignoreConsecutiveComments` set to `true`:
 ```js
 /* eslint capitalized-comments: ["error", "always", { "ignoreConsecutiveComments": true }] */
 
+foo();
 // this comment is invalid, but only on this line.
 // this comment does NOT get reported, since it is a consecutive comment.
 ```
 
 :::
 
-### Using Different Options for Line and Block Comments
+### Use Different Options for Line and Block Comments
 
 If you wish to have a different configuration for line comments and block comments, you can do so by using two different object configurations (note that the capitalization option will be enforced consistently for line and block comments):
 

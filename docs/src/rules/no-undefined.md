@@ -1,6 +1,5 @@
 ---
 title: no-undefined
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-undef-init
@@ -18,7 +17,7 @@ The `undefined` variable in JavaScript is actually a property of the global obje
 
 ```js
 function doSomething(data) {
-    var undefined = "hi";
+    const undefined = "hi";
 
     // doesn't do what you think it does
     if (data === undefined) {
@@ -47,17 +46,19 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-undefined: "error"*/
 
-var foo = undefined;
+const foo = undefined;
 
-var undefined = "foo";
+const undefined = "foo";
 
 if (foo === undefined) {
     // ...
 }
 
-function foo(undefined) {
+function baz(undefined) {
     // ...
 }
+
+bar(undefined, "lorem");
 ```
 
 :::
@@ -69,18 +70,24 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-undefined: "error"*/
 
-var foo = void 0;
+const foo = void 0;
 
-var Undefined = "foo";
+const Undefined = "foo";
 
 if (typeof foo === "undefined") {
     // ...
 }
 
 global.undefined = "foo";
+
+bar(void 0, "lorem");
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

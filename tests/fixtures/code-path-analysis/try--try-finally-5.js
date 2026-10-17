@@ -1,4 +1,6 @@
-/*eslint-env node*/
+/*languageOptions
+    { "sourceType": "commonjs" }
+*/
 /*expected
 initial->s1_1->s1_3->s1_4->s1_5->s1_6->s1_9->s1_11;
 s1_1->s1_5;
@@ -31,7 +33,7 @@ digraph {
     node[shape=box,style="rounded,filled",fillcolor=white];
     initial[label="",shape=circle,style=filled,fillcolor=black,width=0.25,height=0.25];
     final[label="",shape=doublecircle,style=filled,fillcolor=black,width=0.25,height=0.25];
-    thrown[label="✘",shape=circle,width=0.3,height=0.3,fixedsize];
+    thrown[label="✘",shape=circle,width=0.3,height=0.3,fixedsize=true];
     s1_1[label="Program\nTryStatement\nBlockStatement\nTryStatement\nBlockStatement\nIfStatement\nIdentifier (a)"];
     s1_3[label="BlockStatement\nReturnStatement"];
     s1_4[style="rounded,dashed,filled",fillcolor="#FF9800",label="<<unreachable>>\nBlockStatement:exit"];

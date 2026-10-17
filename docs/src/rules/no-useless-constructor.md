@@ -1,6 +1,5 @@
 ---
 title: no-useless-constructor
-layout: doc
 rule_type: suggestion
 ---
 
@@ -24,15 +23,12 @@ class B extends A {
 
 This rule flags class constructors that can be safely removed without changing how the class works.
 
-## Examples
-
 Examples of **incorrect** code for this rule:
 
 ::: incorrect
 
 ```js
 /*eslint no-useless-constructor: "error"*/
-/*eslint-env es6*/
 
 class A {
     constructor () {
@@ -57,19 +53,19 @@ Examples of **correct** code for this rule:
 
 class A { }
 
-class A {
+class B {
     constructor () {
         doSomething();
     }
 }
 
-class B extends A {
+class C extends A {
     constructor() {
         super('foo');
     }
 }
 
-class B extends A {
+class D extends A {
     constructor() {
         super();
         doSomething();
@@ -78,6 +74,50 @@ class B extends A {
 ```
 
 :::
+
+This rule additionally supports TypeScript type syntax.
+
+Examples of **incorrect** TypeScript code for this rule:
+
+::: incorrect
+
+```ts
+/* eslint no-useless-constructor: "error" */
+
+class A {
+    public constructor() {}
+}
+```
+
+:::
+
+Examples of **correct** TypeScript code for this rule:
+
+::: correct
+
+```ts
+/* eslint no-useless-constructor: "error" */
+
+class A {
+    protected constructor() {}
+}
+
+class B extends A {
+    public constructor() {
+        super();
+    }
+}
+
+class C {
+    constructor(@decorated param) {}
+}
+```
+
+:::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

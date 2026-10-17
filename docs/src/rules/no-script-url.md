@@ -1,6 +1,5 @@
 ---
 title: no-script-url
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://stackoverflow.com/questions/13497971/what-is-the-matter-with-script-targeted-urls
@@ -24,6 +23,10 @@ location.href = `javascript:void(0)`;
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## Compatibility
 

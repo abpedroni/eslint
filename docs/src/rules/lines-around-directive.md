@@ -1,15 +1,10 @@
 ---
 title: lines-around-directive
-layout: doc
 rule_type: layout
 related_rules:
 - lines-around-comment
 - padded-blocks
 ---
-
-
-
-This rule was **deprecated** in ESLint v4.0.0 and replaced by the [padding-line-between-statements](padding-line-between-statements) rule.
 
 Directives are used in JavaScript to indicate to the execution environment that a script would like to opt into a feature such as `"strict mode"`. Directives are grouped together in a [directive prologue](https://www.ecma-international.org/ecma-262/7.0/#directive-prologue) at the top of either a file or function block and are applied to the scope in which they occur.
 
@@ -61,19 +56,13 @@ This is the default option.
 
 Examples of **incorrect** code for this rule with the `"always"` option:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", "always"] */
 
-/* Top of file */
-"use strict";
-var foo;
-
-/* Top of file */
 // comment
 "use strict";
-"use asm";
 var foo;
 
 function foo() {
@@ -91,23 +80,29 @@ function foo() {
 
 :::
 
-Examples of **correct** code for this rule with the `"always"` option:
-
-::: correct
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", "always"] */
 
-/* Top of file */
+// comment
 "use strict";
-
+"use asm";
 var foo;
+```
 
-/* Top of file */
+:::
+
+Examples of **correct** code for this rule with the `"always"` option:
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", "always"] */
+
 // comment
 
 "use strict";
-"use asm";
 
 var foo;
 
@@ -125,6 +120,21 @@ function foo() {
 
   var bar;
 }
+```
+
+:::
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", "always"] */
+
+// comment
+
+"use strict";
+"use asm";
+
+var foo;
 ```
 
 :::
@@ -133,22 +143,14 @@ function foo() {
 
 Examples of **incorrect** code for this rule with the `"never"` option:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", "never"] */
 
-/* Top of file */
-
-"use strict";
-
-var foo;
-
-/* Top of file */
 // comment
 
 "use strict";
-"use asm";
 
 var foo;
 
@@ -170,21 +172,30 @@ function foo() {
 
 :::
 
-Examples of **correct** code for this rule with the `"never"` option:
-
-::: correct
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", "never"] */
 
-/* Top of file */
-"use strict";
-var foo;
-
-/* Top of file */
 // comment
+
 "use strict";
 "use asm";
+
+var foo;
+```
+
+:::
+
+Examples of **correct** code for this rule with the `"never"` option:
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", "never"] */
+
+// comment
+"use strict";
 var foo;
 
 function foo() {
@@ -198,6 +209,19 @@ function foo() {
   "use strict";
   var bar;
 }
+```
+
+:::
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", "never"] */
+
+// comment
+"use strict";
+"use asm";
+var foo;
 ```
 
 :::
@@ -206,21 +230,14 @@ function foo() {
 
 Examples of **incorrect** code for this rule with the `{ "before": "never", "after": "always" }` option:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", { "before": "never", "after": "always" }] */
 
-/* Top of file */
-
-"use strict";
-var foo;
-
-/* Top of file */
 // comment
 
 "use strict";
-"use asm";
 var foo;
 
 function foo() {
@@ -235,26 +252,33 @@ function foo() {
   "use strict";
   var bar;
 }
+```
+
+:::
+
+::: incorrect { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", { "before": "never", "after": "always" }] */
+
+// comment
+
+"use strict";
+"use asm";
+var foo;
 ```
 
 :::
 
 Examples of **correct** code for this rule with the `{ "before": "never", "after": "always" }`  option:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", { "before": "never", "after": "always" }] */
 
-/* Top of file */
-"use strict";
-
-var foo;
-
-/* Top of file */
 // comment
 "use strict";
-"use asm";
 
 var foo;
 
@@ -271,26 +295,33 @@ function foo() {
 
   var bar;
 }
+```
+
+:::
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", { "before": "never", "after": "always" }] */
+
+// comment
+"use strict";
+"use asm";
+
+var foo;
 ```
 
 :::
 
 Examples of **incorrect** code for this rule with the `{ "before": "always", "after": "never" }` option:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", { "before": "always", "after": "never" }] */
 
-/* Top of file */
-"use strict";
-
-var foo;
-
-/* Top of file */
 // comment
 "use strict";
-"use asm";
 
 var foo;
 
@@ -311,22 +342,30 @@ function foo() {
 
 :::
 
-Examples of **correct** code for this rule with the `{ "before": "always", "after": "never" }` option:
-
-::: correct
+::: incorrect { "sourceType": "script" }
 
 ```js
 /* eslint lines-around-directive: ["error", { "before": "always", "after": "never" }] */
 
-/* Top of file */
+// comment
 "use strict";
-var foo;
+"use asm";
 
-/* Top of file */
+var foo;
+```
+
+:::
+
+Examples of **correct** code for this rule with the `{ "before": "always", "after": "never" }` option:
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", { "before": "always", "after": "never" }] */
+
 // comment
 
 "use strict";
-"use asm";
 var foo;
 
 function foo() {
@@ -341,6 +380,20 @@ function foo() {
   "use strict";
   var bar;
 }
+```
+
+:::
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint lines-around-directive: ["error", { "before": "always", "after": "never" }] */
+
+// comment
+
+"use strict";
+"use asm";
+var foo;
 ```
 
 :::

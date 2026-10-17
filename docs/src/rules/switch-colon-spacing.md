@@ -1,11 +1,7 @@
 ---
 title: switch-colon-spacing
-layout: doc
 rule_type: layout
 ---
-
-
-
 Spacing around colons improves readability of `case`/`default` clauses.
 
 ## Rule Details

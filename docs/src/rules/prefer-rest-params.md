@@ -1,6 +1,5 @@
 ---
 title: prefer-rest-params
-layout: doc
 rule_type: suggestion
 related_rules:
 - prefer-spread
@@ -16,11 +15,9 @@ We can use that feature for variadic functions instead of the `arguments` variab
 
 This rule is aimed to flag usage of `arguments` variables.
 
-## Examples
-
 Examples of **incorrect** code for this rule:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint prefer-rest-params: "error"*/
@@ -30,12 +27,12 @@ function foo() {
 }
 
 function foo(action) {
-    var args = Array.prototype.slice.call(arguments, 1);
+    const args = Array.prototype.slice.call(arguments, 1);
     action.apply(null, args);
 }
 
 function foo(action) {
-    var args = [].slice.call(arguments, 1);
+    const args = [].slice.call(arguments, 1);
     action.apply(null, args);
 }
 ```
@@ -44,7 +41,7 @@ function foo(action) {
 
 Examples of **correct** code for this rule:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint prefer-rest-params: "error"*/
@@ -62,12 +59,16 @@ function foo(arguments) {
     console.log(arguments); // This is the first argument.
 }
 function foo() {
-    var arguments = 0;
+    const arguments = 0;
     console.log(arguments); // This is a local variable.
 }
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

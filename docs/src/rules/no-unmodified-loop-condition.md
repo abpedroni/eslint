@@ -1,6 +1,5 @@
 ---
 title: no-unmodified-loop-condition
-layout: doc
 rule_type: problem
 ---
 
@@ -26,8 +25,9 @@ while (node) {
 This rule finds references which are inside of loop conditions, then checks the
 variables of those references are modified in the loop.
 
-If a reference is inside of a binary expression or a ternary expression, this rule checks the result of
-the expression instead.
+By default, if a reference is inside of a binary expression or a ternary expression, this rule checks
+the result of the expression instead. The `checkConditionalExpressions` option stops the rule from
+grouping references solely because they belong to the same ternary expression.
 If a reference is inside of a dynamic expression (e.g. `CallExpression`,
 `YieldExpression`, ...), this rule ignores it.
 
@@ -38,15 +38,15 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-unmodified-loop-condition: "error"*/
 
-var node = something;
+let node = something;
 
 while (node) {
     doSomething(node);
 }
 node = other;
 
-for (var j = 0; j < items.length; ++i) {
-    doSomething(items[j]);
+for (let j = 0; j < 5;) {
+    doSomething(j);
 }
 
 while (node !== root) {
@@ -68,7 +68,7 @@ while (node) {
     node = node.parent;
 }
 
-for (var j = 0; j < items.length; ++j) {
+for (let j = 0; j < items.length; ++j) {
     doSomething(items[j]);
 }
 
@@ -93,6 +93,30 @@ while (obj.foo) {
 // A function call can return various values.
 while (check(obj)) {
     doSomething(obj);
+}
+```
+
+:::
+
+## Options
+
+This rule has an object option:
+
+* `"checkConditionalExpressions": false` (default) checks the result of an entire ternary expression
+* `"checkConditionalExpressions": true` each branch in a ternary expression is checked independently
+
+Examples of **incorrect** code for this rule with the `{ "checkConditionalExpressions": true }` option:
+
+::: incorrect
+
+```js
+/* eslint no-unmodified-loop-condition: ["error", { "checkConditionalExpressions": true }] */
+
+let chunk = getInitialChunk();
+let done = false;
+
+while (chunk ? !done : false) {
+    chunk = nextOrNull();
 }
 ```
 

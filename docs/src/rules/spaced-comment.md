@@ -1,13 +1,9 @@
 ---
 title: spaced-comment
-layout: doc
 rule_type: suggestion
 related_rules:
 - spaced-line-comment
 ---
-
-
-
 Some style guides require or disallow a whitespace immediately after the initial `//` or `/*` of a comment.
 Whitespace after the `//` or `/*` makes it easier to read text in comments.
 On the other hand, commenting out code is easier without having to put a whitespace right after the `//` or `/*`.

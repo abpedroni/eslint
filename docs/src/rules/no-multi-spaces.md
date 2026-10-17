@@ -1,6 +1,5 @@
 ---
 title: no-multi-spaces
-layout: doc
 rule_type: layout
 related_rules:
 - key-spacing
@@ -11,9 +10,6 @@ related_rules:
 - space-unary-ops
 - space-return-throw-case
 ---
-
-
-
 Multiple spaces in a row that are not used for indentation are typically mistakes. For example:
 
 ```js

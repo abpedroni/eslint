@@ -1,6 +1,5 @@
 ---
 title: default-param-last
-layout: doc
 rule_type: suggestion
 ---
 
@@ -29,7 +28,7 @@ Examples of **incorrect** code for this rule:
 
 function f(a = 0, b) {}
 
-function f(a, b = 0, c) {}
+function g(a, b = 0, c) {}
 ```
 
 :::
@@ -42,6 +41,39 @@ Examples of **correct** code for this rule:
 /* eslint default-param-last: ["error"] */
 
 function f(a, b = 0) {}
+
+function g(a, b = 0, c = 0) {}
 ```
 
 :::
+
+This rule additionally supports TypeScript type syntax.
+
+Examples of **incorrect** TypeScript code for this rule:
+
+::: incorrect
+
+```ts
+/* eslint default-param-last: ["error"] */
+
+function h(a = 0, b: number) {}
+```
+
+:::
+
+Examples of **correct** TypeScript code for this rule:
+
+::: correct
+
+```ts
+/* eslint default-param-last: ["error"] */
+
+function h(a = 0, b?: number) {}
+```
+
+:::
+
+## Options
+
+This rule has no options.
+

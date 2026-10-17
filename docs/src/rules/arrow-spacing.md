@@ -1,16 +1,10 @@
 ---
 title: arrow-spacing
-layout: doc
 rule_type: layout
 ---
-
-
-
 This rule normalize style of spacing before/after an arrow function's arrow(`=>`).
 
 ```js
-/*eslint-env es6*/
-
 // { "before": true, "after": true }
 (a) => {}
 
@@ -32,7 +26,6 @@ Examples of **incorrect** code for this rule with the default `{ "before": true,
 
 ```js
 /*eslint arrow-spacing: "error"*/
-/*eslint-env es6*/
 
 ()=> {};
 () =>{};
@@ -52,7 +45,6 @@ Examples of **correct** code for this rule with the default `{ "before": true, "
 
 ```js
 /*eslint arrow-spacing: "error"*/
-/*eslint-env es6*/
 
 () => {};
 (a) => {};
@@ -68,7 +60,6 @@ Examples of **incorrect** code for this rule with the `{ "before": false, "after
 
 ```js
 /*eslint arrow-spacing: ["error", { "before": false, "after": false }]*/
-/*eslint-env es6*/
 
 () =>{};
 (a) => {};
@@ -83,7 +74,6 @@ Examples of **correct** code for this rule with the `{ "before": false, "after":
 
 ```js
 /*eslint arrow-spacing: ["error", { "before": false, "after": false }]*/
-/*eslint-env es6*/
 
 ()=>{};
 (a)=>{};
@@ -98,7 +88,6 @@ Examples of **incorrect** code for this rule with the `{ "before": false, "after
 
 ```js
 /*eslint arrow-spacing: ["error", { "before": false, "after": true }]*/
-/*eslint-env es6*/
 
 () =>{};
 (a) => {};
@@ -113,7 +102,6 @@ Examples of **correct** code for this rule with the `{ "before": false, "after":
 
 ```js
 /*eslint arrow-spacing: ["error", { "before": false, "after": true }]*/
-/*eslint-env es6*/
 
 ()=> {};
 (a)=> {};

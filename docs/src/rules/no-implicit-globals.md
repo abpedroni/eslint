@@ -1,6 +1,5 @@
 ---
 title: no-implicit-globals
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-undef
@@ -31,10 +30,6 @@ variables. ES modules also have implicit `strict` mode, which prevents global va
 
 By default, this rule does not check `const`, `let` and `class` declarations.
 
-This rule has an object option with one option:
-
-* Set `"lexicalBindings"` to `true` if you want this rule to check `const`, `let` and `class` declarations as well.
-
 ## Rule Details
 
 ### `var` and `function` declarations
@@ -45,7 +40,7 @@ This rule disallows `var` and `function` declarations at the top-level script sc
 
 Examples of **incorrect** code for this rule:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: "error"*/
@@ -59,7 +54,7 @@ function bar() {}
 
 Examples of **correct** code for this rule:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: "error"*/
@@ -78,7 +73,7 @@ window.bar = function() {};
 
 :::
 
-Examples of **correct** code for this rule with `"parserOptions": { "sourceType": "module" }` in the ESLint configuration:
+Examples of **correct** code for this rule with `"languageOptions": { "sourceType": "module" }` in the ESLint configuration:
 
 ::: correct
 
@@ -101,7 +96,7 @@ This does not apply to ES modules since the module code is implicitly in `strict
 
 Examples of **incorrect** code for this rule:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: "error"*/
@@ -119,16 +114,13 @@ Bar.prototype.baz = function () {
 
 This rule also disallows redeclarations of read-only global variables and assignments to read-only global variables.
 
-A read-only global variable can be a built-in ES global (e.g. `Array`), an environment specific global
-(e.g. `window` in the browser environment), or a global variable defined as `readonly` in the configuration file
-or in a `/*global */` comment.
+A read-only global variable can be a built-in ES global (e.g. `Array`), or a global variable defined as `readonly` in the configuration file or in a `/*global */` comment.
 
-* [Specifying Environments](../user-guide/configuring#specifying-environments)
-* [Specifying Globals](../user-guide/configuring#specifying-globals)
+See also: [Specify Globals](../use/configure/language-options#specify-globals)
 
 Examples of **incorrect** code for this rule:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: "error"*/
@@ -143,6 +135,29 @@ var Object;
 
 :::
 
+### exported
+
+You can use `/* exported variableName */` block comments in the same way as in [`no-unused-vars`](./no-unused-vars). See the [`no-unused-vars` exported section](./no-unused-vars#exported) for details.
+
+Examples of **correct** code for `/* exported variableName */` operation:
+
+::: correct { "sourceType": "script" }
+
+```js
+/* eslint no-implicit-globals: error */
+/* exported global_var */
+
+var global_var = 42;
+```
+
+:::
+
+## Options
+
+This rule has an object option with one option:
+
+* Set `"lexicalBindings"` to `true` if you want this rule to check `const`, `let` and `class` declarations as well.
+
 ### `const`, `let` and `class` declarations
 
 Lexical declarations `const` and `let`, as well as `class` declarations, create variables that are block-scoped.
@@ -156,7 +171,7 @@ If the variable is intended to be local to the script, wrap the code with a bloc
 
 Examples of **correct** code for this rule with `"lexicalBindings"` option set to `false` (default):
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: ["error", {"lexicalBindings": false}]*/
@@ -172,7 +187,7 @@ class Bar {}
 
 Examples of **incorrect** code for this rule with `"lexicalBindings"` option set to `true`:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: ["error", {"lexicalBindings": true}]*/
@@ -188,7 +203,7 @@ class Bar {}
 
 Examples of **correct** code for this rule with `"lexicalBindings"` option set to `true`:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: ["error", {"lexicalBindings": true}]*/
@@ -222,7 +237,7 @@ Even the `typeof` check is not safe from TDZ reference exceptions.
 
 Examples of **incorrect** code for this rule with `"lexicalBindings"` option set to `true`:
 
-::: incorrect
+::: incorrect { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: ["error", {"lexicalBindings": true}]*/
@@ -240,7 +255,7 @@ const MyGlobalFunction = (function() {
 
 Examples of **correct** code for this rule with `"lexicalBindings"` option set to `true`:
 
-::: correct
+::: correct { "sourceType": "script" }
 
 ```js
 /*eslint no-implicit-globals: ["error", {"lexicalBindings": true}]*/
@@ -252,22 +267,6 @@ window.MyGlobalFunction = (function() {
         return a + b;
     }
 }());
-```
-
-:::
-
-### exported
-
-You can use `/* exported variableName */` block comments in the same way as in [`no-unused-vars`](./no-unused-vars). See the [`no-unused-vars` exported section](./no-unused-vars#exported) for details.
-
-Examples of **correct** code for `/* exported variableName */` operation:
-
-::: correct
-
-```js
-/* exported global_var */
-
-var global_var = 42;
 ```
 
 :::

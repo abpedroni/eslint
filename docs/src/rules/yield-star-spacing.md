@@ -1,12 +1,9 @@
 ---
 title: yield-star-spacing
-layout: doc
 rule_type: layout
 further_reading:
 - https://leanpub.com/understandinges6/read/#leanpub-auto-generators
 ---
-
-
 
 ## Rule Details
 
@@ -39,8 +36,6 @@ The option also has a string shorthand:
 "yield-star-spacing": ["error", "after"]
 ```
 
-## Examples
-
 ### after
 
 Examples of **correct** code for this rule with the default `"after"` option:
@@ -49,7 +44,6 @@ Examples of **correct** code for this rule with the default `"after"` option:
 
 ```js
 /*eslint yield-star-spacing: ["error", "after"]*/
-/*eslint-env es6*/
 
 function* generator() {
   yield* other();
@@ -66,7 +60,6 @@ Examples of **correct** code for this rule with the `"before"` option:
 
 ```js
 /*eslint yield-star-spacing: ["error", "before"]*/
-/*eslint-env es6*/
 
 function *generator() {
   yield *other();
@@ -83,7 +76,6 @@ Examples of **correct** code for this rule with the `"both"` option:
 
 ```js
 /*eslint yield-star-spacing: ["error", "both"]*/
-/*eslint-env es6*/
 
 function * generator() {
   yield * other();
@@ -100,7 +92,6 @@ Examples of **correct** code for this rule with the `"neither"` option:
 
 ```js
 /*eslint yield-star-spacing: ["error", "neither"]*/
-/*eslint-env es6*/
 
 function*generator() {
   yield*other();

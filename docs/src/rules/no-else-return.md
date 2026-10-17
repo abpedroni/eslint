@@ -1,6 +1,5 @@
 ---
 title: no-else-return
-layout: doc
 rule_type: suggestion
 ---
 
@@ -20,16 +19,7 @@ function foo() {
 
 ## Rule Details
 
-This rule is aimed at highlighting an unnecessary block of code following an `if` containing a return statement. As such, it will warn when it encounters an `else` following a chain of `if`s, all of them containing a `return` statement.
-
-## Options
-
-This rule has an object option:
-
-* `allowElseIf: true` (default) allows `else if` blocks after a return
-* `allowElseIf: false` disallows `else if` blocks after a return
-
-### `allowElseIf: true`
+This rule is aimed at highlighting an unnecessary block of code following an `if` containing a `return` statement. As such, it will warn when it encounters an `else` following a chain of `if`s, all of them containing a `return` statement.
 
 Examples of **incorrect** code for this rule:
 
@@ -38,7 +28,7 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-else-return: "error"*/
 
-function foo() {
+function foo1() {
     if (x) {
         return y;
     } else {
@@ -46,27 +36,15 @@ function foo() {
     }
 }
 
-function foo() {
-    if (x) {
-        return y;
-    } else if (z) {
-        return w;
-    } else {
-        return t;
-    }
-}
-
-function foo() {
+function foo2() {
     if (x) {
         return y;
     } else {
-        var t = "foo";
+        const t = "foo";
     }
-
-    return t;
 }
 
-function foo() {
+function foo3() {
     if (error) {
         return 'It failed';
     } else {
@@ -77,7 +55,7 @@ function foo() {
 }
 
 // Two warnings for nested occurrences
-function foo() {
+function foo4() {
     if (x) {
         if (y) {
             return y;
@@ -99,7 +77,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-else-return: "error"*/
 
-function foo() {
+function foo1() {
     if (x) {
         return y;
     }
@@ -107,25 +85,61 @@ function foo() {
     return z;
 }
 
-function foo() {
+function foo2() {
     if (x) {
         return y;
-    } else if (z) {
-        var t = "foo";
-    } else {
-        return w;
     }
+
+    const t = "foo";
 }
 
-function foo() {
+function foo3() {
+    if (error) {
+        return 'It failed';
+    }
+
+    if (loading) {
+        return "It's still loading";
+    }   
+}
+
+function foo4() {
     if (x) {
-        if (z) {
+        if (y) {
             return y;
         }
-    } else {
-        return z;
+
+        return x;
     }
+
+    return z;    
 }
+
+function foo5() {
+  if (x) {
+    const t = "foo";
+  } else {
+    return y
+  }
+}
+```
+
+:::
+
+## Options
+
+### allowElseIf
+
+This rule has an object option:
+
+* `allowElseIf: true` (default) - If true, allows `else if` blocks after a `return`
+
+Examples of **correct** code for the default `{"allowElseIf": true}` option:
+
+::: correct
+
+```js
+/*eslint no-else-return: ["error", {allowElseIf: true}]*/
 
 function foo() {
     if (error) {
@@ -134,13 +148,22 @@ function foo() {
         return "It's still loading";
     }
 }
+
+// Using multiple `if` statements instead of `else if` is also allowed
+function foo2() {
+    if (error) {
+        return 'It failed';
+    }
+  
+    if (loading) {
+        return "It's still loading";
+    }
+}
 ```
 
 :::
 
-### `allowElseIf: false`
-
-Examples of **incorrect** code for this rule:
+Examples of **incorrect** code for the `{"allowElseIf": false}` option:
 
 ::: incorrect
 
@@ -158,7 +181,7 @@ function foo() {
 
 :::
 
-Examples of **correct** code for this rule:
+Examples of **correct** code for the `{"allowElseIf": false}` option:
 
 ::: correct
 

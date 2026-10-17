@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-useless-catch"),
-    { RuleTester } = require("../../../lib/rule-tester");
+	RuleTester = require("../../../lib/rule-tester/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -20,15 +20,15 @@ const rule = require("../../../lib/rules/no-useless-catch"),
 const ruleTester = new RuleTester();
 
 ruleTester.run("no-useless-catch", rule, {
-    valid: [
-        `
+	valid: [
+		`
             try {
                 foo();
             } catch (err) {
                 console.error(err);
             }
         `,
-        `
+		`
             try {
                 foo();
             } catch (err) {
@@ -37,7 +37,7 @@ ruleTester.run("no-useless-catch", rule, {
                 bar();
             }
         `,
-        `
+		`
             try {
                 foo();
             } catch (err) {
@@ -45,54 +45,54 @@ ruleTester.run("no-useless-catch", rule, {
                 throw err;
             }
         `,
-        `
+		`
             try {
                 foo();
             } catch (err) {
                 throw err.msg;
             }
         `,
-        `
+		`
             try {
                 foo();
             } catch (err) {
                 throw new Error("whoops!");
             }
         `,
-        `
+		`
             try {
                 foo();
             } catch (err) {
                 throw bar;
             }
         `,
-        `
+		`
             try {
                 foo();
             } catch (err) { }
         `,
-        {
-            code: `
+		{
+			code: `
                 try {
                     foo();
                 } catch ({ err }) {
                     throw err;
                 }
             `,
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: `
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: `
                 try {
                     foo();
                 } catch ([ err ]) {
                     throw err;
                 }
             `,
-            parserOptions: { ecmaVersion: 6 }
-        },
-        {
-            code: `
+			languageOptions: { ecmaVersion: 6 },
+		},
+		{
+			code: `
                 async () => {
                     try {
                         await doSomething();
@@ -102,36 +102,40 @@ ruleTester.run("no-useless-catch", rule, {
                     }
                 }
             `,
-            parserOptions: { ecmaVersion: 8 }
-        },
-        {
-            code: `
+			languageOptions: { ecmaVersion: 8 },
+		},
+		{
+			code: `
                 try {
                     throw new Error('foo');
                 } catch {
                     throw new Error('foo');
                 }
             `,
-            parserOptions: { ecmaVersion: 2019 }
-        }
-
-    ],
-    invalid: [
-        {
-            code: `
+			languageOptions: { ecmaVersion: 2019 },
+		},
+	],
+	invalid: [
+		{
+			code: `
                 try {
                     foo();
                 } catch (err) {
                     throw err;
                 }
             `,
-            errors: [{
-                messageId: "unnecessaryCatch",
-                type: "TryStatement"
-            }]
-        },
-        {
-            code: `
+			errors: [
+				{
+					messageId: "unnecessaryCatch",
+					line: 2,
+					column: 17,
+					endLine: 6,
+					endColumn: 18,
+				},
+			],
+		},
+		{
+			code: `
                 try {
                     foo();
                 } catch (err) {
@@ -140,13 +144,18 @@ ruleTester.run("no-useless-catch", rule, {
                     foo();
                 }
             `,
-            errors: [{
-                messageId: "unnecessaryCatchClause",
-                type: "CatchClause"
-            }]
-        },
-        {
-            code: `
+			errors: [
+				{
+					messageId: "unnecessaryCatchClause",
+					line: 4,
+					column: 19,
+					endLine: 6,
+					endColumn: 18,
+				},
+			],
+		},
+		{
+			code: `
                 try {
                     foo();
                 } catch (err) {
@@ -154,13 +163,18 @@ ruleTester.run("no-useless-catch", rule, {
                     throw err;
                 }
             `,
-            errors: [{
-                messageId: "unnecessaryCatch",
-                type: "TryStatement"
-            }]
-        },
-        {
-            code: `
+			errors: [
+				{
+					messageId: "unnecessaryCatch",
+					line: 2,
+					column: 17,
+					endLine: 7,
+					endColumn: 18,
+				},
+			],
+		},
+		{
+			code: `
                 try {
                     foo();
                 } catch (err) {
@@ -170,13 +184,18 @@ ruleTester.run("no-useless-catch", rule, {
                     foo();
                 }
             `,
-            errors: [{
-                messageId: "unnecessaryCatchClause",
-                type: "CatchClause"
-            }]
-        },
-        {
-            code: `
+			errors: [
+				{
+					messageId: "unnecessaryCatchClause",
+					line: 4,
+					column: 19,
+					endLine: 7,
+					endColumn: 18,
+				},
+			],
+		},
+		{
+			code: `
                 async () => {
                     try {
                         await doSomething();
@@ -185,11 +204,16 @@ ruleTester.run("no-useless-catch", rule, {
                     }
                 }
             `,
-            parserOptions: { ecmaVersion: 8 },
-            errors: [{
-                messageId: "unnecessaryCatch",
-                type: "TryStatement"
-            }]
-        }
-    ]
+			languageOptions: { ecmaVersion: 8 },
+			errors: [
+				{
+					messageId: "unnecessaryCatch",
+					line: 3,
+					column: 21,
+					endLine: 7,
+					endColumn: 22,
+				},
+			],
+		},
+	],
 });

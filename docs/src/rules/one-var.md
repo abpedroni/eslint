@@ -1,12 +1,9 @@
 ---
 title: one-var
-layout: doc
 rule_type: suggestion
 ---
 
-
-
-Variables can be declared at any point in JavaScript code using `var`, `let`, or `const`. There are many styles and preferences related to the declaration of variables, and one of those is deciding on how many variable declarations should be allowed in a single function.
+Variables can be declared at any point in JavaScript code using `var`, `let`, `const`, `using`, or `await using`. There are many styles and preferences related to the declaration of variables, and one of those is deciding on how many variable declarations should be allowed in a single function.
 
 There are two schools of thought in this regard:
 
@@ -32,7 +29,7 @@ The single-declaration school of thought is based in pre-ECMAScript 6 behaviors,
 
 ## Rule Details
 
-This rule enforces variables to be declared either together or separately per function ( for `var`) or block (for `let` and `const`) scope.
+This rule enforces variables to be declared either together or separately per function ( for `var`) or block (for `let`, `const`, `using`, and `await using`) scope.
 
 ## Options
 
@@ -55,6 +52,12 @@ Object option:
 * `"const": "always"` requires one `const` declaration per block
 * `"const": "never"` requires multiple `const` declarations per block
 * `"const": "consecutive"` requires consecutive `const` declarations to be a single declaration
+* `"using": "always"` requires one `using` declaration per block
+* `"using": "never"` requires multiple `using` declarations per block
+* `"using": "consecutive"` requires consecutive `using` declarations to be a single declaration
+* `"awaitUsing": "always"` requires one `await using` declaration per block
+* `"awaitUsing": "never"` requires multiple `await using` declarations per block
+* `"awaitUsing": "consecutive"` requires consecutive `await using` declarations to be a single declaration
 * `"separateRequires": true` enforces `requires` to be separate from declarations
 
 Alternate object option:
@@ -75,21 +78,21 @@ Examples of **incorrect** code for this rule with the default `"always"` option:
 ```js
 /*eslint one-var: ["error", "always"]*/
 
-function foo() {
+function foo1() {
     var bar;
     var baz;
     let qux;
     let norf;
 }
 
-function foo(){
+function foo2(){
     const bar = false;
     const baz = true;
     let qux;
     let norf;
 }
 
-function foo() {
+function foo3() {
     var bar;
 
     if (baz) {
@@ -126,21 +129,21 @@ Examples of **correct** code for this rule with the default `"always"` option:
 ```js
 /*eslint one-var: ["error", "always"]*/
 
-function foo() {
+function foo1() {
     var bar,
         baz;
     let qux,
         norf;
 }
 
-function foo(){
+function foo2(){
     const bar = true,
         baz = false;
     let qux,
         norf;
 }
 
-function foo() {
+function foo3() {
     var bar,
         qux;
 
@@ -149,7 +152,7 @@ function foo() {
     }
 }
 
-function foo(){
+function foo4(){
     let bar;
 
     if (baz) {
@@ -193,14 +196,14 @@ Examples of **incorrect** code for this rule with the `"never"` option:
 ```js
 /*eslint one-var: ["error", "never"]*/
 
-function foo() {
+function foo1() {
     var bar,
         baz;
-    const bar = true,
-        baz = false;
+    const qux = true,
+        foobar = false;
 }
 
-function foo() {
+function foo2() {
     var bar,
         qux;
 
@@ -209,7 +212,7 @@ function foo() {
     }
 }
 
-function foo(){
+function foo3(){
     let bar = true,
         baz = false;
 }
@@ -231,12 +234,12 @@ Examples of **correct** code for this rule with the `"never"` option:
 ```js
 /*eslint one-var: ["error", "never"]*/
 
-function foo() {
+function foo1() {
     var bar;
     var baz;
 }
 
-function foo() {
+function foo2() {
     var bar;
 
     if (baz) {
@@ -244,7 +247,7 @@ function foo() {
     }
 }
 
-function foo() {
+function foo3() {
     let bar;
 
     if (baz) {
@@ -278,12 +281,12 @@ Examples of **incorrect** code for this rule with the `"consecutive"` option:
 ```js
 /*eslint one-var: ["error", "consecutive"]*/
 
-function foo() {
+function foo1() {
     var bar;
     var baz;
 }
 
-function foo(){
+function foo2(){
     var bar = 1;
     var baz = 2;
 
@@ -312,12 +315,12 @@ Examples of **correct** code for this rule with the `"consecutive"` option:
 ```js
 /*eslint one-var: ["error", "consecutive"]*/
 
-function foo() {
+function foo1() {
     var bar,
         baz;
 }
 
-function foo(){
+function foo2(){
     var bar = 1,
         baz = 2;
 
@@ -340,53 +343,65 @@ class C {
 
 :::
 
-### var, let, and const
+### var, let, const, using, and awaitUsing
 
-Examples of **incorrect** code for this rule with the `{ var: "always", let: "never", const: "never" }` option:
+Examples of **incorrect** code for this rule with the `{ var: "always", let: "never", const: "never", using: "never", awaitUsing: "never" }` option:
 
 ::: incorrect
 
 ```js
-/*eslint one-var: ["error", { var: "always", let: "never", const: "never" }]*/
-/*eslint-env es6*/
+/*eslint one-var: ["error", { var: "always", let: "never", const: "never", using: "never", awaitUsing: "never" }]*/
 
-function foo() {
+function foo1() {
     var bar;
     var baz;
     let qux,
         norf;
 }
 
-function foo() {
+function foo2() {
     const bar = 1,
           baz = 2;
     let qux,
         norf;
 }
+
+async function foo3() {
+    using bar = 1,
+          baz = 2;
+    await using qux = 3,
+                norf = 4;
+}
 ```
 
 :::
 
-Examples of **correct** code for this rule with the `{ var: "always", let: "never", const: "never" }` option:
+Examples of **correct** code for this rule with the `{ var: "always", let: "never", const: "never", using: "never", awaitUsing: "never" }` option:
 
 ::: correct
 
 ```js
-/*eslint one-var: ["error", { var: "always", let: "never", const: "never" }]*/
-/*eslint-env es6*/
+/*eslint one-var: ["error", { var: "always", let: "never", const: "never", using: "never", awaitUsing: "never" }]*/
 
-function foo() {
+function foo1() {
     var bar,
         baz;
     let qux;
     let norf;
 }
 
-function foo() {
+function foo2() {
     const bar = 1;
     const baz = 2;
     let qux;
     let norf;
+}
+
+async function foo3() {
+    using bar = 1;
+    using baz = 2;
+    await using qux = 3;
+    await using norf = 4;
 }
 ```
 
@@ -398,7 +413,6 @@ Examples of **incorrect** code for this rule with the `{ var: "never" }` option:
 
 ```js
 /*eslint one-var: ["error", { var: "never" }]*/
-/*eslint-env es6*/
 
 function foo() {
     var bar,
@@ -414,19 +428,30 @@ Examples of **correct** code for this rule with the `{ var: "never" }` option:
 
 ```js
 /*eslint one-var: ["error", { var: "never" }]*/
-/*eslint-env es6*/
 
-function foo() {
-    var bar,
-        baz;
-    const bar = 1; // `const` and `let` declarations are ignored if they are not specified
-    const baz = 2;
+async function foo() {
+    var bar;
+    var baz;
+
+    // `const`, `let`, `using` and `await using` declarations are ignored if they are not specified
+    const foobar = 1;
+    const foobaz = 2;
+    const barfoo = 1, bazfoo = 2;
     let qux;
     let norf;
+    let fooqux, foonorf;
+    using foobarfoo = 1;
+    using foobazfoo = 2;
+    using bazbarfoo = 1, bazfoobar = 2;
+    await using foobarbaz = 1;
+    await using foobazqux = 2;
+    await using bazbarqux = 1, bazfooqux = 2;
 }
 ```
 
 :::
+
+The `separateRequires` option applies to any variable whose initializer is a `require()` call. It does not check whether `require` refers to the CommonJS global or to a local binding with the same name, such as a function parameter.
 
 Examples of **incorrect** code for this rule with the `{ separateRequires: true }` option:
 
@@ -434,7 +459,6 @@ Examples of **incorrect** code for this rule with the `{ separateRequires: true 
 
 ```js
 /*eslint one-var: ["error", { separateRequires: true, var: "always" }]*/
-/*eslint-env node*/
 
 var foo = require("foo"),
     bar = "bar";
@@ -448,7 +472,6 @@ Examples of **correct** code for this rule with the `{ separateRequires: true }`
 
 ```js
 /*eslint one-var: ["error", { separateRequires: true, var: "always" }]*/
-/*eslint-env node*/
 
 var foo = require("foo");
 var bar = "bar";
@@ -459,21 +482,22 @@ var bar = "bar";
 ::: correct
 
 ```js
+/*eslint one-var: ["error", { separateRequires: true, var: "always" }]*/
+
 var foo = require("foo"),
     bar = require("bar");
 ```
 
 :::
 
-Examples of **incorrect** code for this rule with the `{ var: "never", let: "consecutive", const: "consecutive" }` option:
+Examples of **incorrect** code for this rule with the `{ var: "never", let: "consecutive", const: "consecutive", using: "consecutive", awaitUsing: "consecutive" }` option:
 
 ::: incorrect
 
 ```js
-/*eslint one-var: ["error", { var: "never", let: "consecutive", const: "consecutive" }]*/
-/*eslint-env es6*/
+/*eslint one-var: ["error", { var: "never", let: "consecutive", const: "consecutive", using: "consecutive", awaitUsing: "consecutive" }]*/
 
-function foo() {
+function foo1() {
     let a,
         b;
     let c;
@@ -482,10 +506,28 @@ function foo() {
         e;
 }
 
-function foo() {
+function foo2() {
     const a = 1,
         b = 2;
     const c = 3;
+
+    var d,
+        e;
+}
+
+function foo3() {
+    using a = 1,
+        b = 2;
+    using c = 3;
+
+    var d,
+        e;
+}
+
+async function foo4() {
+    await using a = 1,
+        b = 2;
+    await using c = 3;
 
     var d,
         e;
@@ -494,15 +536,14 @@ function foo() {
 
 :::
 
-Examples of **correct** code for this rule with the `{ var: "never", let: "consecutive", const: "consecutive" }` option:
+Examples of **correct** code for this rule with the `{ var: "never", let: "consecutive", const: "consecutive", using: "consecutive", awaitUsing: "consecutive" }` option:
 
 ::: correct
 
 ```js
-/*eslint one-var: ["error", { var: "never", let: "consecutive", const: "consecutive" }]*/
-/*eslint-env es6*/
+/*eslint one-var: ["error", { var: "never", let: "consecutive", const: "consecutive", using: "consecutive", awaitUsing: "consecutive" }]*/
 
-function foo() {
+function foo1() {
     let a,
         b;
 
@@ -512,7 +553,7 @@ function foo() {
     let f;
 }
 
-function foo() {
+function foo2() {
     const a = 1,
           b = 2;
 
@@ -520,6 +561,26 @@ function foo() {
     var d;
 
     const e = 3;
+}
+
+function foo3() {
+    using a = 1,
+          b = 2;
+
+    var c;
+    var d;
+
+    using e = 3;
+}
+
+async function foo4() {
+    await using a = 1,
+          b = 2;
+
+    var c;
+    var d;
+
+    await using e = 3;
 }
 ```
 
@@ -531,7 +592,6 @@ Examples of **incorrect** code for this rule with the `{ var: "consecutive" }` o
 
 ```js
 /*eslint one-var: ["error", { var: "consecutive" }]*/
-/*eslint-env es6*/
 
 function foo() {
     var a;
@@ -547,15 +607,20 @@ Examples of **correct** code for this rule with the `{ var: "consecutive" }` opt
 
 ```js
 /*eslint one-var: ["error", { var: "consecutive" }]*/
-/*eslint-env es6*/
 
-function foo() {
+async function foo() {
     var a,
         b;
-    const c = 1; // `const` and `let` declarations are ignored if they are not specified
+ 
+    // `const`, `let`, `using`, and `await using` declarations are ignored if they are not specified
+    const c = 1;
     const d = 2;
     let e;
     let f;
+    using g = 3;
+    using h = 4;
+    await using i = 5;
+    await using j = 6;
 }
 ```
 
@@ -569,7 +634,6 @@ Examples of **incorrect** code for this rule with the `{ "initialized": "always"
 
 ```js
 /*eslint one-var: ["error", { "initialized": "always", "uninitialized": "never" }]*/
-/*eslint-env es6*/
 
 function foo() {
     var a, b, c;
@@ -613,7 +677,6 @@ Examples of **incorrect** code for this rule with the `{ "initialized": "never" 
 
 ```js
 /*eslint one-var: ["error", { "initialized": "never" }]*/
-/*eslint-env es6*/
 
 function foo() {
     var foo = true,

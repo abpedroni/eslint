@@ -1,11 +1,7 @@
 ---
 title: no-trailing-spaces
-layout: doc
 rule_type: layout
 ---
-
-
-
 Sometimes in the course of editing files, you can end up with extra whitespace at the end of lines. These whitespace differences can be picked up by source control systems and flagged as diffs, causing frustration for developers. While this extra whitespace causes no functional issues, many code conventions require that trailing spaces be removed before check-in.
 
 ## Rule Details
@@ -19,9 +15,9 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-trailing-spaces: "error"*/
 
-var foo = 0;//•••••
-var baz = 5;//••
-//•••••
+var foo = 0;/* trailing whitespace */     
+var baz = 5;/* trailing whitespace */  
+/* trailing whitespace */     
 ```
 
 :::
@@ -59,7 +55,8 @@ Examples of **correct** code for this rule with the `{ "skipBlankLines": true }`
 
 var foo = 0;
 var baz = 5;
-//•••••
+// ↓ a line with whitespace only ↓
+     
 ```
 
 :::
@@ -73,12 +70,12 @@ Examples of **correct** code for this rule with the `{ "ignoreComments": true }`
 ```js
 /*eslint no-trailing-spaces: ["error", { "ignoreComments": true }]*/
 
-//foo•
-//•••••
+// ↓ these comments have trailing whitespace → 
+//     
 /**
- *•baz
- *••
- *•bar
+ * baz
+ *  
+ * bar
  */
 ```
 

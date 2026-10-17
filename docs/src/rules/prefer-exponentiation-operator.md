@@ -1,6 +1,5 @@
 ---
 title: prefer-exponentiation-operator
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Exponentiation
@@ -52,6 +51,10 @@ let quux = (-1) ** n;
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

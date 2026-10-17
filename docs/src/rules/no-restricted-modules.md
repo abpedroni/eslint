@@ -1,11 +1,7 @@
 ---
 title: no-restricted-modules
-layout: doc
 rule_type: suggestion
 ---
-
-
-This rule was **deprecated** in ESLint v7.0.0. Please use the corresponding rule in [`eslint-plugin-node`](https://github.com/mysticatea/eslint-plugin-node).
 
 A module in Node.js is a simple or complex functionality organized in a JavaScript file which can be reused throughout the Node.js
 application. The keyword `require` is used in Node.js/CommonJS to import modules into an application. This way you can have dynamic loading where the loaded module name isn't predefined /static, or where you conditionally load a module only if it's "truly required".
@@ -62,7 +58,7 @@ or like this:
 
 The custom message will be appended to the default error message. Please note that you may not specify custom error messages for restricted patterns as a particular module may match more than one pattern.
 
-To restrict the use of all Node.js core modules (via <https://github.com/nodejs/node/tree/master/lib>):
+To restrict the use of all Node.js core modules (via <https://github.com/nodejs/node/tree/main/lib>):
 
 ```json
 {
@@ -72,8 +68,6 @@ To restrict the use of all Node.js core modules (via <https://github.com/nodejs/
 }
 ```
 
-## Examples
-
 Examples of **incorrect** code for this rule  with sample `"fs", "cluster", "lodash"` restricted modules:
 
 ::: incorrect
@@ -81,8 +75,8 @@ Examples of **incorrect** code for this rule  with sample `"fs", "cluster", "lod
 ```js
 /*eslint no-restricted-modules: ["error", "fs", "cluster"]*/
 
-var fs = require('fs');
-var cluster = require('cluster');
+const fs = require('fs');
+const cluster = require('cluster');
 ```
 
 :::
@@ -92,7 +86,7 @@ var cluster = require('cluster');
 ```js
 /*eslint no-restricted-modules: ["error", {"paths": ["cluster"] }]*/
 
-var cluster = require('cluster');
+const cluster = require('cluster');
 ```
 
 :::
@@ -102,7 +96,7 @@ var cluster = require('cluster');
 ```js
 /*eslint no-restricted-modules: ["error", { "patterns": ["lodash/*"] }]*/
 
-var pick = require('lodash/pick');
+const pick = require('lodash/pick');
 ```
 
 :::
@@ -114,7 +108,7 @@ Examples of **correct** code for this rule with sample `"fs", "cluster", "lodash
 ```js
 /*eslint no-restricted-modules: ["error", "fs", "cluster"]*/
 
-var crypto = require('crypto');
+const crypto = require('crypto');
 ```
 
 :::
@@ -127,8 +121,8 @@ var crypto = require('crypto');
     "patterns": ["lodash/*", "!lodash/pick"]
 }]*/
 
-var crypto = require('crypto');
-var pick = require('lodash/pick');
+const crypto = require('crypto');
+const pick = require('lodash/pick');
 ```
 
 :::

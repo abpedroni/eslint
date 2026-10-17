@@ -1,6 +1,5 @@
 ---
 title: no-plusplus
-layout: doc
 rule_type: suggestion
 ---
 
@@ -8,8 +7,8 @@ rule_type: suggestion
 Because the unary `++` and `--` operators are subject to automatic semicolon insertion, differences in whitespace can change semantics of source code.
 
 ```js
-var i = 10;
-var j = 20;
+let i = 10;
+let j = 20;
 
 i ++
 j
@@ -17,8 +16,8 @@ j
 ```
 
 ```js
-var i = 10;
-var j = 20;
+let i = 10;
+let j = 20;
 
 i
 ++
@@ -37,14 +36,14 @@ Examples of **incorrect** code for this rule:
 ```js
 /*eslint no-plusplus: "error"*/
 
-var foo = 0;
+let foo = 0;
 foo++;
 
-var bar = 42;
+let bar = 42;
 bar--;
 
-for (i = 0; i < l; i++) {
-    return;
+for (let i = 0; i < l; i++) {
+    doSomething(i);
 }
 ```
 
@@ -57,14 +56,14 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-plusplus: "error"*/
 
-var foo = 0;
+let foo = 0;
 foo += 1;
 
-var bar = 42;
+let bar = 42;
 bar -= 1;
 
-for (i = 0; i < l; i += 1) {
-    return;
+for (let i = 0; i < l; i += 1) {
+    doSomething(i);
 }
 ```
 
@@ -85,15 +84,15 @@ Examples of **correct** code for this rule with the `{ "allowForLoopAfterthought
 ```js
 /*eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }]*/
 
-for (i = 0; i < l; i++) {
+for (let i = 0; i < l; i++) {
     doSomething(i);
 }
 
-for (i = l; i >= 0; i--) {
+for (let i = l; i >= 0; i--) {
     doSomething(i);
 }
 
-for (i = 0, j = l; i < l; i++, j--) {
+for (let i = 0, j = l; i < l; i++, j--) {
     doSomething(i, j);
 }
 ```
@@ -107,15 +106,15 @@ Examples of **incorrect** code for this rule with the `{ "allowForLoopAfterthoug
 ```js
 /*eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }]*/
 
-for (i = 0; i < l; j = i++) {
+for (let i = 0; i < l; j = i++) {
     doSomething(i, j);
 }
 
-for (i = l; i--;) {
+for (let i = l; i--;) {
     doSomething(i);
 }
 
-for (i = 0; i < l;) i++;
+for (let i = 0; i < l;) i++;
 ```
 
 :::

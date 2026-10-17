@@ -1,9 +1,10 @@
 "use strict";
 
+/** @typedef {import("../lib/types").Linter.Parser} Parser */
+
 const evk = require("eslint-visitor-keys");
-const recast = require("recast");
 const espree = require("espree");
-const assert = require("assert");
+const assert = require("node:assert");
 
 /**
  * Determines whether an AST node could be an expression, based on the type
@@ -11,10 +12,12 @@ const assert = require("assert");
  * @returns {boolean} `true` if the node could be an expression
  */
 function isMaybeExpression(node) {
-    return node.type.endsWith("Expression") ||
-        node.type === "Identifier" ||
-        node.type === "MetaProperty" ||
-        node.type.endsWith("Literal");
+	return (
+		node.type.endsWith("Expression") ||
+		node.type === "Identifier" ||
+		node.type === "MetaProperty" ||
+		node.type.endsWith("Literal")
+	);
 }
 
 /**
@@ -23,7 +26,7 @@ function isMaybeExpression(node) {
  * @returns {boolean} `true` if the node is a statement
  */
 function isStatement(node) {
-    return node.type.endsWith("Statement") || node.type.endsWith("Declaration");
+	return node.type.endsWith("Statement") || node.type.endsWith("Declaration");
 }
 
 /**
@@ -39,167 +42,259 @@ function isStatement(node) {
  * @returns {string} Another piece of "bad" source text, which may or may not be smaller than the original source text.
  */
 function reduceBadExampleSize({
-    sourceText,
-    predicate,
-    parser = {
-        parse: (code, options) =>
-            espree.parse(code, {
-                ...options,
-                loc: true,
-                range: true,
-                raw: true,
-                tokens: true,
-                comment: true,
-                eslintVisitorKeys: true,
-                eslintScopeManager: true,
-                ecmaVersion: espree.latestEcmaVersion,
-                sourceType: "script"
-            })
-    },
-    visitorKeys = evk.KEYS
+	sourceText,
+	predicate,
+	parser = {
+		parse: (code, options) =>
+			espree.parse(code, {
+				...options,
+				loc: true,
+				range: true,
+				raw: true,
+				tokens: true,
+				comment: true,
+				eslintVisitorKeys: true,
+				eslintScopeManager: true,
+				ecmaVersion: espree.latestEcmaVersion,
+				sourceType: "script",
+			}),
+	},
+	visitorKeys = evk.KEYS,
 }) {
-    let counter = 0;
+	let counter = 0;
 
-    /**
-     * Returns a new unique identifier
-     * @returns {string} A name for a new identifier
-     */
-    function generateNewIdentifierName() {
-        return `$${(counter++)}`;
-    }
+	/**
+	 * Returns a new unique identifier
+	 * @returns {string} A name for a new identifier
+	 */
+	function generateNewIdentifierName() {
+		return `$${counter++}`;
+	}
 
-    /**
-     * Determines whether a source text sample is "bad"
-     * @param {string} updatedSourceText The sample
-     * @returns {boolean} `true` if the sample is "bad"
-     */
-    function reproducesBadCase(updatedSourceText) {
-        try {
-            parser.parse(updatedSourceText);
-        } catch {
-            return false;
-        }
+	/**
+	 * Determines whether a source text sample is "bad"
+	 * @param {string} updatedSourceText The sample
+	 * @returns {boolean} `true` if the sample is "bad"
+	 */
+	function reproducesBadCase(updatedSourceText) {
+		try {
+			parser.parse(updatedSourceText);
+		} catch {
+			return false;
+		}
 
-        return predicate(updatedSourceText);
-    }
+		return predicate(updatedSourceText);
+	}
 
-    assert(reproducesBadCase(sourceText), "Original source text should reproduce issue");
-    const parseResult = recast.parse(sourceText, { parser });
+	assert(
+		reproducesBadCase(sourceText),
+		"Original source text should reproduce issue",
+	);
+	const ast = parser.parse(sourceText);
 
-    /**
-     * Recursively removes descendant subtrees of the given AST node and replaces
-     * them with simplified variants to produce a simplified AST which is still considered "bad".
-     * @param {ASTNode} node An AST node to prune. May be mutated by this call, but the
-     * resulting AST will still produce "bad" source code.
-     * @returns {void}
-     */
-    function pruneIrrelevantSubtrees(node) {
-        for (const key of visitorKeys[node.type]) {
-            if (Array.isArray(node[key])) {
-                for (let index = node[key].length - 1; index >= 0; index--) {
-                    const [childNode] = node[key].splice(index, 1);
+	/*
+	 * Track committed source-text modifications as { start, end, replacement } objects.
+	 * All modifications are non-overlapping — the algorithm only modifies a subtree after
+	 * deciding not to remove its ancestor, so ranges at different recursion levels are disjoint.
+	 */
+	const modifications = [];
 
-                    if (!reproducesBadCase(recast.print(parseResult).code)) {
-                        node[key].splice(index, 0, childNode);
-                        if (childNode) {
-                            pruneIrrelevantSubtrees(childNode);
-                        }
-                    }
-                }
-            } else if (typeof node[key] === "object" && node[key] !== null) {
+	/**
+	 * Applies all committed modifications (plus an optional pending one) to the
+	 * original source text and returns the result. Modifications are applied in
+	 * reverse source order so that each offset remains valid when applied.
+	 * @param {{ start: number, end: number, replacement: string } | null} [pendingMod] An uncommitted modification to include in this preview
+	 * @returns {string} The modified source text
+	 */
+	function buildSource(pendingMod) {
+		const allMods = pendingMod
+			? [...modifications, pendingMod]
+			: [...modifications];
 
-                const childNode = node[key];
+		allMods.sort((a, b) => b.start - a.start);
 
-                if (isMaybeExpression(childNode)) {
-                    node[key] = { type: "Identifier", name: generateNewIdentifierName(), range: childNode.range };
-                    if (!reproducesBadCase(recast.print(parseResult).code)) {
-                        node[key] = childNode;
-                        pruneIrrelevantSubtrees(childNode);
-                    }
-                } else if (isStatement(childNode)) {
-                    node[key] = { type: "EmptyStatement", range: childNode.range };
-                    if (!reproducesBadCase(recast.print(parseResult).code)) {
-                        node[key] = childNode;
-                        pruneIrrelevantSubtrees(childNode);
-                    }
-                }
-            }
-        }
-    }
+		let result = sourceText;
 
-    /**
-     * Recursively tries to extract a descendant node from the AST that is "bad" on its own
-     * @param {ASTNode} node A node which produces "bad" source code
-     * @returns {ASTNode} A descendent of `node` which is also bad
-     */
-    function extractRelevantChild(node) {
-        const childNodes = visitorKeys[node.type]
-            .flatMap(key => (Array.isArray(node[key]) ? node[key] : [node[key]]));
+		for (const { start, end, replacement } of allMods) {
+			result = result.slice(0, start) + replacement + result.slice(end);
+		}
 
-        for (const childNode of childNodes) {
-            if (!childNode) {
-                continue;
-            }
+		return result;
+	}
 
-            if (isMaybeExpression(childNode)) {
-                if (reproducesBadCase(recast.print(childNode).code)) {
-                    return extractRelevantChild(childNode);
-                }
+	/**
+	 * Recursively removes descendant subtrees of the given AST node and replaces
+	 * them with simplified variants to produce simplified source which is still "bad".
+	 * Committed modifications are recorded in {@link modifications}; the AST is also
+	 * mutated so that traversal state stays consistent with the committed changes.
+	 * @param {ASTNode} node An AST node to prune.
+	 * @returns {void}
+	 */
+	function pruneIrrelevantSubtrees(node) {
+		for (const key of visitorKeys[node.type] ?? []) {
+			if (Array.isArray(node[key])) {
+				for (let index = node[key].length - 1; index >= 0; index--) {
+					const childNode = node[key][index];
 
-            } else if (isStatement(childNode)) {
-                if (reproducesBadCase(recast.print(childNode).code)) {
-                    return extractRelevantChild(childNode);
-                }
-            } else {
-                const childResult = extractRelevantChild(childNode);
+					if (!childNode) {
+						continue;
+					}
 
-                if (reproducesBadCase(recast.print(childResult).code)) {
-                    return childResult;
-                }
-            }
-        }
-        return node;
-    }
+					const mod = {
+						start: childNode.range[0],
+						end: childNode.range[1],
+						replacement: "",
+					};
 
-    /**
-     * Removes and simplifies comments from the source text
-     * @param {string} text A piece of "bad" source text
-     * @returns {string} A piece of "bad" source text with fewer and/or simpler comments.
-     */
-    function removeIrrelevantComments(text) {
-        const ast = parser.parse(text);
+					if (reproducesBadCase(buildSource(mod))) {
+						modifications.push(mod);
+						node[key].splice(index, 1);
+					} else {
+						pruneIrrelevantSubtrees(childNode);
+					}
+				}
+			} else if (typeof node[key] === "object" && node[key] !== null) {
+				const childNode = node[key];
 
-        if (ast.comments) {
-            for (const comment of ast.comments) {
-                for (const potentialSimplification of [
+				if (isMaybeExpression(childNode)) {
+					const name = generateNewIdentifierName();
+					const mod = {
+						start: childNode.range[0],
+						end: childNode.range[1],
+						replacement: name,
+					};
 
-                    // Try deleting the comment
-                    `${text.slice(0, comment.range[0])}${text.slice(comment.range[1])}`,
+					if (reproducesBadCase(buildSource(mod))) {
+						modifications.push(mod);
+						node[key] = {
+							type: "Identifier",
+							name,
+							range: childNode.range,
+						};
+					} else {
+						pruneIrrelevantSubtrees(childNode);
+					}
+				} else if (isStatement(childNode)) {
+					const mod = {
+						start: childNode.range[0],
+						end: childNode.range[1],
+						replacement: ";",
+					};
 
-                    // Try replacing the comment with a space
-                    `${text.slice(0, comment.range[0])} ${text.slice(comment.range[1])}`,
+					if (reproducesBadCase(buildSource(mod))) {
+						modifications.push(mod);
+						node[key] = {
+							type: "EmptyStatement",
+							range: childNode.range,
+						};
+					} else {
+						pruneIrrelevantSubtrees(childNode);
+					}
+				}
+			}
+		}
+	}
 
-                    // Try deleting the contents of the comment
-                    text.slice(0, comment.range[0] + 2) + text.slice(comment.type === "Block" ? comment.range[1] - 2 : comment.range[1])
-                ]) {
-                    if (reproducesBadCase(potentialSimplification)) {
-                        return removeIrrelevantComments(potentialSimplification);
-                    }
-                }
-            }
-        }
+	/**
+	 * Recursively tries to extract a descendant node from the AST that is "bad" on its own.
+	 * Uses source-range slicing instead of code generation, so it works for every node type.
+	 * @param {ASTNode} node A node which produces "bad" source code
+	 * @param {string} source The source text whose ranges match `node`
+	 * @returns {ASTNode} A descendant of `node` which is also bad (or `node` itself)
+	 */
+	function extractRelevantChild(node, source) {
+		const childNodes = (visitorKeys[node.type] ?? []).flatMap(key =>
+			Array.isArray(node[key]) ? node[key] : [node[key]],
+		);
 
-        return text;
-    }
+		for (const childNode of childNodes) {
+			if (!childNode) {
+				continue;
+			}
 
-    pruneIrrelevantSubtrees(parseResult.program);
-    const relevantChild = recast.print(extractRelevantChild(parseResult.program)).code;
+			if (isMaybeExpression(childNode) || isStatement(childNode)) {
+				const childSource = source.slice(
+					childNode.range[0],
+					childNode.range[1],
+				);
 
-    assert(reproducesBadCase(relevantChild), "Extracted relevant source text should reproduce issue");
-    const result = removeIrrelevantComments(relevantChild);
+				if (reproducesBadCase(childSource)) {
+					return extractRelevantChild(childNode, source);
+				}
+			} else {
+				const childResult = extractRelevantChild(childNode, source);
+				const childResultSource = source.slice(
+					childResult.range[0],
+					childResult.range[1],
+				);
 
-    assert(reproducesBadCase(result), "Source text with irrelevant comments removed should reproduce issue");
-    return result;
+				if (reproducesBadCase(childResultSource)) {
+					return childResult;
+				}
+			}
+		}
+		return node;
+	}
+
+	/**
+	 * Removes and simplifies comments from the source text
+	 * @param {string} text A piece of "bad" source text
+	 * @returns {string} A piece of "bad" source text with fewer and/or simpler comments.
+	 */
+	function removeIrrelevantComments(text) {
+		const textAst = parser.parse(text);
+
+		if (textAst.comments) {
+			for (const comment of textAst.comments) {
+				for (const potentialSimplification of [
+					// Try deleting the comment
+					`${text.slice(0, comment.range[0])}${text.slice(comment.range[1])}`,
+
+					// Try replacing the comment with a space
+					`${text.slice(0, comment.range[0])} ${text.slice(comment.range[1])}`,
+
+					// Try deleting the contents of the comment
+					text.slice(0, comment.range[0] + 2) +
+						text.slice(
+							comment.type === "Block"
+								? comment.range[1] - 2
+								: comment.range[1],
+						),
+				]) {
+					if (reproducesBadCase(potentialSimplification)) {
+						return removeIrrelevantComments(
+							potentialSimplification,
+						);
+					}
+				}
+			}
+		}
+
+		return text;
+	}
+
+	pruneIrrelevantSubtrees(ast);
+
+	// Re-parse the pruned source so that node ranges match the pruned text.
+	const prunedSource = buildSource();
+	const prunedAst = parser.parse(prunedSource);
+	const relevantNode = extractRelevantChild(prunedAst, prunedSource);
+	const relevantChild = prunedSource.slice(
+		relevantNode.range[0],
+		relevantNode.range[1],
+	);
+
+	assert(
+		reproducesBadCase(relevantChild),
+		"Extracted relevant source text should reproduce issue",
+	);
+	const result = removeIrrelevantComments(relevantChild);
+
+	assert(
+		reproducesBadCase(result),
+		"Source text with irrelevant comments removed should reproduce issue",
+	);
+	return result;
 }
 
 module.exports = reduceBadExampleSize;

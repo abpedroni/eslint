@@ -1,11 +1,7 @@
 ---
 title: eol-last
-layout: doc
 rule_type: layout
 ---
-
-
-
 Trailing newlines in non-empty files are a common UNIX idiom. Benefits of
 trailing newlines include the ability to concatenate or append to files as well
 as output files to the terminal without interfering with shell prompts.
@@ -43,7 +39,8 @@ Examples of **correct** code for this rule:
 
 function doSomething() {
   var foo = 2;
-}\n
+}
+
 ```
 
 :::

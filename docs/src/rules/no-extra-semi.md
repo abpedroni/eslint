@@ -1,21 +1,17 @@
 ---
 title: no-extra-semi
-layout: doc
 rule_type: suggestion
 related_rules:
 - semi
 - semi-spacing
 ---
-
-
-
-
-
 Typing mistakes and misunderstandings about where semicolons are required can lead to semicolons that are unnecessary. While not technically an error, extra semicolons can cause confusion when reading code.
 
 ## Rule Details
 
 This rule disallows unnecessary semicolons.
+
+Problems reported by this rule can be fixed automatically, except when removing a semicolon would cause a following statement to become a directive such as `"use strict"`.
 
 Examples of **incorrect** code for this rule:
 

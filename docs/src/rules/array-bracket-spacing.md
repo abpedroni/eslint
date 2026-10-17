@@ -1,21 +1,15 @@
 ---
 title: array-bracket-spacing
-layout: doc
 rule_type: layout
 related_rules:
 - space-in-parens
 - object-curly-spacing
 - computed-property-spacing
 ---
-
-
-
 A number of style guides require or disallow spaces between array brackets and other tokens. This rule
 applies to both array literals and destructuring assignments (ECMAScript 6).
 
 ```js
-/*eslint-env es6*/
-
 var arr = [ 'foo', 'bar' ];
 var [ x, y ] = z;
 
@@ -59,7 +53,6 @@ Examples of **incorrect** code for this rule with the default `"never"` option:
 
 ```js
 /*eslint array-bracket-spacing: ["error", "never"]*/
-/*eslint-env es6*/
 
 var arr = [ 'foo', 'bar' ];
 var arr = ['foo', 'bar' ];
@@ -82,7 +75,6 @@ Examples of **correct** code for this rule with the default `"never"` option:
 
 ```js
 /*eslint array-bracket-spacing: ["error", "never"]*/
-/*eslint-env es6*/
 
 var arr = [];
 var arr = ['foo', 'bar', 'baz'];
@@ -115,7 +107,6 @@ Examples of **incorrect** code for this rule with the `"always"` option:
 
 ```js
 /*eslint array-bracket-spacing: ["error", "always"]*/
-/*eslint-env es6*/
 
 var arr = ['foo', 'bar'];
 var arr = ['foo', 'bar' ];
@@ -141,7 +132,6 @@ Examples of **correct** code for this rule with the `"always"` option:
 
 ```js
 /*eslint array-bracket-spacing: ["error", "always"]*/
-/*eslint-env es6*/
 
 var arr = [];
 var arr = [ 'foo', 'bar', 'baz' ];

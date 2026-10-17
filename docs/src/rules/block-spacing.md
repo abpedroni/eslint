@@ -1,14 +1,10 @@
 ---
 title: block-spacing
-layout: doc
 rule_type: layout
 related_rules:
 - space-before-blocks
 - brace-style
 ---
-
-
-
 ## Rule Details
 
 This rule enforces consistent spacing inside an open block token and the next token on the same line. This rule also enforces consistent spacing inside a close block token and previous token on the same line.

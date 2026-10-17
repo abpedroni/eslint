@@ -1,6 +1,5 @@
 ---
 title: no-extra-bind
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
@@ -12,7 +11,7 @@ further_reading:
 The `bind()` method is used to create functions with specific `this` values and, optionally, binds arguments to specific values. When used to specify the value of `this`, it's important that the function actually uses `this` in its function body. For example:
 
 ```js
-var boundGetName = (function getName() {
+const boundGetName = (function getName() {
     return this.name;
 }).bind({ name: "ESLint" });
 
@@ -25,7 +24,7 @@ Sometimes during the course of code maintenance, the `this` value is removed fro
 
 ```js
 // useless bind
-var boundGetName = (function getName() {
+const boundGetName = (function getName() {
     return "ESLint";
 }).bind({ name: "ESLint" });
 
@@ -46,27 +45,26 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint no-extra-bind: "error"*/
-/*eslint-env es6*/
 
-var x = function () {
+const x = function () {
     foo();
 }.bind(bar);
 
-var x = (() => {
+const y = (() => {
     foo();
 }).bind(bar);
 
-var x = (() => {
+const z = (() => {
     this.foo();
 }).bind(bar);
 
-var x = function () {
+const a = function () {
     (function () {
       this.foo();
     }());
 }.bind(bar);
 
-var x = function () {
+const b = function () {
     function foo() {
       this.bar();
     }
@@ -82,16 +80,20 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-extra-bind: "error"*/
 
-var x = function () {
+const x = function () {
     this.foo();
 }.bind(bar);
 
-var x = function (a) {
+const y = function (a) {
     return a + 1;
 }.bind(foo, bar);
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

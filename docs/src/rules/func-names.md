@@ -1,6 +1,5 @@
 ---
 title: func-names
-layout: doc
 rule_type: suggestion
 further_reading:
 - https://web.archive.org/web/20201112040809/http://markdaggett.com/blog/2013/02/15/functions-explained/
@@ -24,14 +23,14 @@ This rule can enforce or disallow the use of named function expressions.
 
 This rule has a string option:
 
-* `"always"` (default) requires function expressions to have a name
+* `"always"` (default) requires function expressions to have a name.
 * `"as-needed"` requires function expressions to have a name, if the name isn't assigned automatically per the ECMAScript specification.
-* `"never"` disallows named function expressions, except in recursive functions, where a name is needed
+* `"never"` disallows named function expressions, except in recursive functions, where a name is needed.
 
 This rule has an object option:
 
 * `"generators": "always" | "as-needed" | "never"`
-    * `"always"` require named generators
+    * `"always"` require named generators.
     * `"as-needed"` require named generators if the name isn't assigned automatically per the ECMAScript specification.
     * `"never"` disallow named generators where possible.
 
@@ -114,7 +113,7 @@ Examples of **correct** code for this rule with the `"as-needed"` option:
 ```js
 /*eslint func-names: ["error", "as-needed"]*/
 
-var bar = function() {};
+const bar = function() {};
 
 const cat = {
   meow: function() {}
@@ -193,7 +192,7 @@ Examples of **correct** code for this rule with the `"always", { "generators": "
 ```js
 /*eslint func-names: ["error", "always", { "generators": "as-needed" }]*/
 
-var foo = function*() {};
+const foo = function*() {};
 ```
 
 :::
@@ -205,7 +204,7 @@ Examples of **incorrect** code for this rule with the `"always", { "generators":
 ```js
 /*eslint func-names: ["error", "always", { "generators": "never" }]*/
 
-var foo = bar(function *baz() {});
+const foo = bar(function *baz() {});
 ```
 
 :::
@@ -217,7 +216,7 @@ Examples of **correct** code for this rule with the `"always", { "generators": "
 ```js
 /*eslint func-names: ["error", "always", { "generators": "never" }]*/
 
-var foo = bar(function *() {});
+const foo = bar(function *() {});
 ```
 
 :::
@@ -229,7 +228,7 @@ Examples of **incorrect** code for this rule with the `"as-needed", { "generator
 ```js
 /*eslint func-names: ["error", "as-needed", { "generators": "never" }]*/
 
-var foo = bar(function *baz() {});
+const foo = bar(function *baz() {});
 ```
 
 :::
@@ -241,7 +240,7 @@ Examples of **correct** code for this rule with the `"as-needed", { "generators"
 ```js
 /*eslint func-names: ["error", "as-needed", { "generators": "never" }]*/
 
-var foo = bar(function *() {});
+const foo = bar(function *() {});
 ```
 
 :::
@@ -253,7 +252,7 @@ Examples of **incorrect** code for this rule with the `"never", { "generators": 
 ```js
 /*eslint func-names: ["error", "never", { "generators": "always" }]*/
 
-var foo = bar(function *() {});
+const foo = bar(function *() {});
 ```
 
 :::
@@ -265,7 +264,7 @@ Examples of **correct** code for this rule with the `"never", { "generators": "a
 ```js
 /*eslint func-names: ["error", "never", { "generators": "always" }]*/
 
-var foo = bar(function *baz() {});
+const foo = bar(function *baz() {});
 ```
 
 :::

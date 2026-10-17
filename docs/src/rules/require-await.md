@@ -1,6 +1,5 @@
 ---
 title: require-await
-layout: doc
 rule_type: suggestion
 related_rules:
 - require-yield
@@ -64,7 +63,7 @@ bar(async () => {
     await doSomething();
 });
 
-function foo() {
+function baz() {
     doSomething();
 }
 
@@ -72,11 +71,20 @@ bar(() => {
     doSomething();
 });
 
+async function resourceManagement() {
+    await using resource = getAsyncResource();
+    resource.use();
+}
+
 // Allow empty functions.
 async function noop() {}
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

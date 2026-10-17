@@ -1,11 +1,7 @@
 ---
 title: padding-line-between-statements
-layout: doc
 rule_type: layout
 ---
-
-
-
 This rule requires or disallows blank lines between the given 2 kinds of statements.
 Properly blank lines help developers to understand the code.
 
@@ -89,8 +85,6 @@ You can supply any number of configurations. If a statement pair matches multipl
     * `"while"` is `while` loop statements.
     * `"with"` is `with` statements.
 
-## Examples
-
 This configuration would require blank lines before all `return` statements, like the [newline-before-return](newline-before-return) rule.
 
 Examples of **incorrect** code for the `[{ blankLine: "always", prev: "*", next: "return" }]` configuration:
@@ -121,13 +115,13 @@ Examples of **correct** code for the `[{ blankLine: "always", prev: "*", next: "
     { blankLine: "always", prev: "*", next: "return" }
 ]*/
 
-function foo() {
+function foo1() {
     bar();
 
     return;
 }
 
-function foo() {
+function foo2() {
     return;
 }
 ```
@@ -149,17 +143,17 @@ Examples of **incorrect** code for the `[{ blankLine: "always", prev: ["const", 
     { blankLine: "any",    prev: ["const", "let", "var"], next: ["const", "let", "var"]}
 ]*/
 
-function foo() {
+function foo1() {
     var a = 0;
     bar();
 }
 
-function foo() {
+function foo2() {
     let a = 0;
     bar();
 }
 
-function foo() {
+function foo3() {
     const a = 0;
     bar();
 }
@@ -185,21 +179,21 @@ Examples of **correct** code for the `[{ blankLine: "always", prev: ["const", "l
     { blankLine: "any",    prev: ["const", "let", "var"], next: ["const", "let", "var"]}
 ]*/
 
-function foo() {
+function foo1() {
     var a = 0;
     var b = 0;
 
     bar();
 }
 
-function foo() {
+function foo2() {
     let a = 0;
     const b = 0;
 
     bar();
 }
 
-function foo() {
+function foo3() {
     const a = 0;
     const b = 0;
 

@@ -1,6 +1,5 @@
 ---
 title: no-label-var
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-extra-label
@@ -53,6 +52,10 @@ q:
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

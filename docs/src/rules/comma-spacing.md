@@ -1,6 +1,5 @@
 ---
 title: comma-spacing
-layout: doc
 rule_type: layout
 related_rules:
 - array-bracket-spacing
@@ -16,9 +15,6 @@ further_reading:
 - https://www.crockford.com/code.html
 - https://dojotoolkit.org/reference-guide/1.9/developer/styleguide.html
 ---
-
-
-
 Spacing around commas improves readability of a list of items. Although most of the style guidelines for languages prescribe adding a space after a comma and not before it, it is subjective to the preferences of a project.
 
 ```js
@@ -61,7 +57,7 @@ var arr = [1 , 2];
 var obj = {"foo": "bar" ,"baz": "qur"};
 foo(a ,b);
 new Foo(a ,b);
-function foo(a ,b){}
+function baz(a ,b){}
 a ,b
 ```
 
@@ -81,7 +77,7 @@ var arr = [1,, 3]
 var obj = {"foo": "bar", "baz": "qur"};
 foo(a, b);
 new Foo(a, b);
-function foo(a, b){}
+function qur(a, b){}
 a, b
 ```
 
@@ -132,7 +128,7 @@ var foo = 1, bar = 2;
 var arr = [1 , 2];
 var obj = {"foo": "bar", "baz": "qur"};
 new Foo(a,b);
-function foo(a,b){}
+function baz(a,b){}
 a, b
 ```
 
@@ -152,7 +148,7 @@ var arr = [1 ,,3]
 var obj = {"foo": "bar" ,"baz": "qur"};
 foo(a ,b);
 new Foo(a ,b);
-function foo(a ,b){}
+function qur(a ,b){}
 a ,b
 ```
 

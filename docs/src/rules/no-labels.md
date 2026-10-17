@@ -1,6 +1,5 @@
 ---
 title: no-labels
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-extra-label
@@ -77,7 +76,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-labels: "error"*/
 
-var f = {
+const f = {
     label: "foo"
 };
 

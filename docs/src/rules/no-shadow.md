@@ -1,6 +1,5 @@
 ---
 title: no-shadow
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-shadow-restricted-names
@@ -12,9 +11,9 @@ further_reading:
 Shadowing is the process by which a local variable shares the same name as a variable in its containing scope. For example:
 
 ```js
-var a = 3;
+const a = 3;
 function b() {
-    var a = 10;
+    const a = 10;
 }
 ```
 
@@ -30,32 +29,70 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint no-shadow: "error"*/
-/*eslint-env es6*/
 
-var a = 3;
+const a = 3;
 function b() {
-    var a = 10;
+    const a = 10;
 }
 
-var b = function () {
-    var a = 10;
+const c = function () {
+    const a = 10;
 }
 
-function b(a) {
+function d(a) {
     a = 10;
 }
-b(a);
+d(a);
 
 if (true) {
-    let a = 5;
+    const a = 5;
 }
+
+const f = wrap(function f() {});
+
+const C = wrap(class C {});
+```
+
+:::
+
+Examples of **correct** code for this rule:
+
+::: correct
+
+```js
+/*eslint no-shadow: "error"*/
+
+const a = 3;
+function b(c) {
+    const d = 10;
+    if (c) {
+        const e = 20;
+    }
+}
+
+/*
+ * Function and class names are allowed to shadow a variable
+ * if the function/class expression is assigned to the variable
+ * as its initializer or default value.
+ */
+const f = function f() {};
+const g = foo ? (bar || function g() {}) : baz;
+const { h = function h() {} } = obj;
+function qux(i = function i() {}) {}
+const C = class C {};
 ```
 
 :::
 
 ## Options
 
-This rule takes one option, an object, with properties `"builtinGlobals"`, `"hoist"`, `"allow"` and `"ignoreOnInitialization"`.
+This rule takes one option, an object, with the following properties:
+- `"builtinGlobals"`
+- `"hoist"`
+- `"allow"`
+- `"ignoreOnInitialization"`
+- `"ignoreTypeValueShadow"` (TypeScript only)
+- `"ignoreFunctionTypeParameterNameValueShadow"` (TypeScript only)
 
 ```json
 {
@@ -76,7 +113,7 @@ Examples of **incorrect** code for the `{ "builtinGlobals": true }` option:
 /*eslint no-shadow: ["error", { "builtinGlobals": true }]*/
 
 function foo() {
-    var Object = 0;
+    const Object = 0;
 }
 ```
 
@@ -84,11 +121,13 @@ function foo() {
 
 ### hoist
 
-The `hoist` option has three settings:
+The `hoist` option has five settings:
 
-* `functions` (by default) - reports shadowing before the outer functions are defined.
-* `all` - reports all shadowing before the outer variables/functions are defined.
-* `never` - never report shadowing before the outer variables/functions are defined.
+- `functions` (by default) - reports shadowing before the outer functions are defined.
+- `all` - reports all shadowing before the outer variables/functions are defined.
+- `never` - never report shadowing before the outer variables/functions are defined.
+- `types` (TypeScript only) - reports shadowing before the outer types are defined.
+- `functions-and-types` (TypeScript only) - reports shadowing before the outer functions and types are defined.
 
 #### hoist: functions
 
@@ -98,10 +137,9 @@ Examples of **incorrect** code for the default `{ "hoist": "functions" }` option
 
 ```js
 /*eslint no-shadow: ["error", { "hoist": "functions" }]*/
-/*eslint-env es6*/
 
 if (true) {
-    let b = 6;
+    const b = 6;
 }
 
 function b() {}
@@ -109,7 +147,7 @@ function b() {}
 
 :::
 
-Although `let b` in the `if` statement is before the *function* declaration in the outer scope, it is incorrect.
+Although `const b` in the `if` statement is before the *function* declaration in the outer scope, it is incorrect.
 
 Examples of **correct** code for the default `{ "hoist": "functions" }` option:
 
@@ -117,18 +155,17 @@ Examples of **correct** code for the default `{ "hoist": "functions" }` option:
 
 ```js
 /*eslint no-shadow: ["error", { "hoist": "functions" }]*/
-/*eslint-env es6*/
 
 if (true) {
-    let a = 3;
+    const a = 3;
 }
 
-let a = 5;
+const a = 5;
 ```
 
 :::
 
-Because `let a` in the `if` statement is before the *variable* declaration in the outer scope, it is correct.
+Because `const a` in the `if` statement is before the *variable* declaration in the outer scope, it is correct.
 
 #### hoist: all
 
@@ -138,14 +175,13 @@ Examples of **incorrect** code for the `{ "hoist": "all" }` option:
 
 ```js
 /*eslint no-shadow: ["error", { "hoist": "all" }]*/
-/*eslint-env es6*/
 
 if (true) {
-    let a = 3;
-    let b = 6;
+    const a = 3;
+    const b = 6;
 }
 
-let a = 5;
+const a = 5;
 function b() {}
 ```
 
@@ -159,20 +195,57 @@ Examples of **correct** code for the `{ "hoist": "never" }` option:
 
 ```js
 /*eslint no-shadow: ["error", { "hoist": "never" }]*/
-/*eslint-env es6*/
 
 if (true) {
-    let a = 3;
-    let b = 6;
+    const a = 3;
+    const b = 6;
 }
 
-let a = 5;
+const a = 5;
 function b() {}
 ```
 
 :::
 
-Because `let a` and `let b` in the `if` statement are before the declarations in the outer scope, they are correct.
+Because `const a` and `const b` in the `if` statement are before the declarations in the outer scope, they are correct.
+
+#### hoist: types
+
+Examples of **incorrect** code for the `{ "hoist": "types" }` option:
+
+::: incorrect
+
+```ts
+/*eslint no-shadow: ["error", { "hoist": "types" }]*/
+
+type Bar<Foo> = 1;
+type Foo = 1;
+```
+
+:::
+
+#### hoist: functions-and-types
+
+Examples of **incorrect** code for the `{ "hoist": "functions-and-types" }` option:
+
+::: incorrect
+
+```ts
+/*eslint no-shadow: ["error", { "hoist": "functions-and-types" }]*/
+
+// types
+type Bar<Foo> = 1;
+type Foo = 1;
+
+// functions
+if (true) {
+  const b = 6;
+}
+
+function b() {}
+```
+
+:::
 
 ### allow
 
@@ -184,7 +257,6 @@ Examples of **correct** code for the `{ "allow": ["done"] }` option:
 
 ```js
 /*eslint no-shadow: ["error", { "allow": ["done"] }]*/
-/*eslint-env es6*/
 
 import async from 'async';
 
@@ -214,7 +286,7 @@ Examples of **incorrect** code for the `{ "ignoreOnInitialization": "true" }` op
 ```js
 /*eslint no-shadow: ["error", { "ignoreOnInitialization": true }]*/
 
-var x = x => x;
+const x = x => x;
 ```
 
 :::
@@ -228,11 +300,97 @@ Examples of **correct** code for the `{ "ignoreOnInitialization": true }` option
 ```js
 /*eslint no-shadow: ["error", { "ignoreOnInitialization": true }]*/
 
-var x = foo(x => x)
+const x = foo(x => x)
 
-var y = (y => y)()
+const y = (y => y)()
 ```
 
 :::
 
 The rationale for callback functions is the assumption that they will be called during the initialization, so that at the time when the shadowing variable will be used, the shadowed variable has not yet been initialized.
+
+### ignoreTypeValueShadow
+
+Whether to ignore types named the same as a variable. Default: `true`.
+
+This is generally safe because you cannot use variables in type locations without a typeof operator, so there's little risk of confusion.
+
+Examples of **correct** code with `{ "ignoreTypeValueShadow": true }`:
+
+::: correct
+
+```ts
+/*eslint no-shadow: ["error", { "ignoreTypeValueShadow": true }]*/
+
+type Foo = number;
+interface Bar {
+  prop: number;
+}
+
+function f() {
+  const Foo = 1;
+  const Bar = 'test';
+}
+```
+
+:::
+
+**Note:** Shadowing specifically refers to two identical identifiers that are in different, nested scopes. This is different from redeclaration, which is when two identical identifiers are in the same scope. Redeclaration is covered by the [`no-redeclare`](/rules/no-redeclare) rule instead.
+
+
+### ignoreFunctionTypeParameterNameValueShadow
+
+Whether to ignore function parameters named the same as a variable. Default: `true`.
+
+Each of a function type's arguments creates a value variable within the scope of the function type. This is done so that you can reference the type later using the typeof operator:
+
+```ts
+type Func = (test: string) => typeof test;
+
+declare const fn: Func;
+const result = fn('str'); // typeof result === string
+```
+
+This means that function type arguments shadow value variable names in parent scopes:
+
+```ts
+let test = 1;
+type TestType = typeof test; // === number
+type Func = (test: string) => typeof test; // this "test" references the argument, not the variable
+
+declare const fn: Func;
+const result = fn('str'); // typeof result === string
+```
+
+If you do not use the `typeof` operator in a function type return type position, you can safely turn this option on.
+
+Examples of **correct** code with `{ "ignoreFunctionTypeParameterNameValueShadow": true }`:
+
+::: correct
+
+```ts
+/*eslint no-shadow: ["error", { "ignoreFunctionTypeParameterNameValueShadow": true }]*/
+
+const test = 1;
+type Func = (test: string) => typeof test;
+```
+
+:::
+
+### Why does the rule report on enum members that share the same name as a variable in a parent scope?
+
+This isn't a bug — the rule is working exactly as intended! The report is correct because of a lesser-known aspect of enums: enum members introduce a variable within the enum's own scope, allowing them to be referenced without needing a qualifier.
+
+Here's a simple example to explain:
+
+```ts
+const A = 2;
+enum Test {
+  A = 1,
+  B = A,
+}
+
+console.log(Test.B); // what should be logged?
+```
+
+At first glance, you might think it should log `2`, because the outer variable A's value is `2`. However, it actually logs `1`, the value of `Test.A`. This happens because inside the enum `B = A` is treated as `B = Test.A`. Due to this behavior, the enum member has shadowed the outer variable declaration.

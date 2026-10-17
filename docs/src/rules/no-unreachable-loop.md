@@ -1,6 +1,5 @@
 ---
 title: no-unreachable-loop
-layout: doc
 rule_type: problem
 related_rules:
 - no-unreachable
@@ -57,7 +56,7 @@ function verifyList(head) {
 }
 
 function findSomething(arr) {
-    for (var i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         if (isSomething(arr[i])) {
             return arr[i];
         } else {
@@ -111,7 +110,7 @@ function verifyList(head) {
 }
 
 function findSomething(arr) {
-    for (var i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         if (isSomething(arr[i])) {
             return arr[i];
         }
@@ -185,7 +184,7 @@ Examples of **correct** code for this rule with the `"ignore"` option:
 ```js
 /*eslint no-unreachable-loop: ["error", { "ignore": ["ForInStatement", "ForOfStatement"] }]*/
 
-for (var key in obj) {
+for (let key in obj) {
   hasEnumerableProperties = true;
   break;
 }

@@ -1,6 +1,5 @@
 ---
 title: no-useless-catch
-layout: doc
 rule_type: suggestion
 ---
 
@@ -64,6 +63,10 @@ try {
 ```
 
 :::
+
+## Options
+
+This rule has no options.
 
 ## When Not To Use It
 

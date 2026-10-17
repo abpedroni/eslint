@@ -1,6 +1,5 @@
 ---
 title: array-element-newline
-layout: doc
 rule_type: layout
 related_rules:
 - array-bracket-spacing
@@ -12,9 +11,6 @@ related_rules:
 - block-spacing
 - brace-style
 ---
-
-
-
 A number of style guides require or disallow line breaks between array elements.
 
 ## Rule Details

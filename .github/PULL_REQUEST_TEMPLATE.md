@@ -1,12 +1,21 @@
 <!--
     Thank you for contributing!
 
-    ESLint adheres to the [JS Foundation Code of Conduct](https://eslint.org/conduct).
+    ESLint adheres to the [OpenJS Foundation Code of Conduct](https://eslint.org/conduct).
 -->
 
 #### Prerequisites checklist
 
 - [ ] I have read the [contributing guidelines](https://github.com/eslint/eslint/blob/HEAD/CONTRIBUTING.md).
+
+#### AI acknowledgment
+
+Check all that apply.
+
+- [ ] I did _not_ use AI to generate this PR
+- [ ] I used AI to write or edit the description of this PR (including translation)
+- [ ] I used AI to understand the codebase
+- [ ] I used AI to write or edit the files in this PR _and_ I reviewed the files
 
 #### What is the purpose of this pull request? (put an "X" next to an item)
 
@@ -31,7 +40,7 @@
 <!--
     Please ensure your pull request is ready:
 
-    - Read the pull request guide (https://eslint.org/docs/developer-guide/contributing/pull-requests)
+    - Read the pull request guide (https://eslint.org/docs/latest/contribute/pull-requests)
     - Include tests for this change
     - Update documentation for this change (if appropriate)
 -->

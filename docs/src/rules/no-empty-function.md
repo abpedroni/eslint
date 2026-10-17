@@ -1,6 +1,5 @@
 ---
 title: no-empty-function
-layout: doc
 rule_type: suggestion
 related_rules:
 - no-empty
@@ -35,19 +34,18 @@ Examples of **incorrect** code for this rule:
 
 ```js
 /*eslint no-empty-function: "error"*/
-/*eslint-env es6*/
 
 function foo() {}
 
-var foo = function() {};
+const bar = function() {};
 
-var foo = () => {};
+const bar1 = () => {};
 
-function* foo() {}
+function* baz() {}
 
-var foo = function*() {};
+const bar2 = function*() {};
 
-var obj = {
+const obj = {
     foo: function() {},
 
     foo: function*() {},
@@ -90,29 +88,28 @@ Examples of **correct** code for this rule:
 
 ```js
 /*eslint no-empty-function: "error"*/
-/*eslint-env es6*/
 
 function foo() {
     // do nothing.
 }
 
-var foo = function() {
+const baz = function() {
     // any clear comments.
 };
 
-var foo = () => {
+const baz1 = () => {
     bar();
 };
 
-function* foo() {
+function* foobar() {
     // do nothing.
 }
 
-var foo = function*() {
+const baz2 = function*() {
     // do nothing.
 };
 
-var obj = {
+const obj = {
     foo: function() {
         // do nothing.
     },
@@ -194,6 +191,10 @@ This rule has an option to allow specific kinds of functions to be empty.
     * `"constructors"` - Class constructors.
     * `"asyncFunctions"` - Async functions.
     * `"asyncMethods"` - Async class methods and method shorthands of object literals.
+    * `"privateConstructors"` - Private class constructors. (TypeScript only)
+    * `"protectedConstructors"` - Protected class constructors. (TypeScript only)
+    * `"decoratedFunctions"` - Class methods with decorators. (TypeScript only)
+    * `"overrideMethods"` - Methods that use the override keyword. (TypeScript only)
 
 ### allow: functions
 
@@ -206,9 +207,9 @@ Examples of **correct** code for the `{ "allow": ["functions"] }` option:
 
 function foo() {}
 
-var foo = function() {};
+const bar = function() {};
 
-var obj = {
+const obj = {
     foo: function() {}
 };
 ```
@@ -223,9 +224,8 @@ Examples of **correct** code for the `{ "allow": ["arrowFunctions"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["arrowFunctions"] }]*/
-/*eslint-env es6*/
 
-var foo = () => {};
+const foo = () => {};
 ```
 
 :::
@@ -238,13 +238,12 @@ Examples of **correct** code for the `{ "allow": ["generatorFunctions"] }` optio
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["generatorFunctions"] }]*/
-/*eslint-env es6*/
 
 function* foo() {}
 
-var foo = function*() {};
+const bar = function*() {};
 
-var obj = {
+const obj = {
     foo: function*() {}
 };
 ```
@@ -259,9 +258,8 @@ Examples of **correct** code for the `{ "allow": ["methods"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["methods"] }]*/
-/*eslint-env es6*/
 
-var obj = {
+const obj = {
     foo() {}
 };
 
@@ -281,9 +279,8 @@ Examples of **correct** code for the `{ "allow": ["generatorMethods"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["generatorMethods"] }]*/
-/*eslint-env es6*/
 
-var obj = {
+const obj = {
     *foo() {}
 };
 
@@ -303,9 +300,8 @@ Examples of **correct** code for the `{ "allow": ["getters"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["getters"] }]*/
-/*eslint-env es6*/
 
-var obj = {
+const obj = {
     get foo() {}
 };
 
@@ -325,9 +321,8 @@ Examples of **correct** code for the `{ "allow": ["setters"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["setters"] }]*/
-/*eslint-env es6*/
 
-var obj = {
+const obj = {
     set foo(value) {}
 };
 
@@ -347,7 +342,6 @@ Examples of **correct** code for the `{ "allow": ["constructors"] }` option:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["constructors"] }]*/
-/*eslint-env es6*/
 
 class A {
     constructor() {}
@@ -364,7 +358,6 @@ Examples of **correct** code for the `{ "allow": ["asyncFunctions"] }` options:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["asyncFunctions"] }]*/
-/*eslint-env es2017*/
 
 async function a(){}
 ```
@@ -379,15 +372,83 @@ Examples of **correct** code for the `{ "allow": ["asyncMethods"] }` options:
 
 ```js
 /*eslint no-empty-function: ["error", { "allow": ["asyncMethods"] }]*/
-/*eslint-env es2017*/
 
-var obj = {
+const obj = {
     async foo() {}
 };
 
 class A {
     async foo() {}
     static async foo() {}
+}
+```
+
+:::
+
+### allow: privateConstructors
+
+Examples of **correct** TypeScript code for the `{ "allow": ["privateConstructors"] }` option:
+
+::: correct
+
+```ts
+/*eslint no-empty-function: ["error", { "allow": ["privateConstructors"] }]*/
+
+class A {
+    private constructor() {}
+}
+```
+
+:::
+
+### allow: protectedConstructors
+
+Examples of **correct** TypeScript code for the `{ "allow": ["protectedConstructors"] }` option:
+
+::: correct
+
+```ts
+/*eslint no-empty-function: ["error", { "allow": ["protectedConstructors"] }]*/
+
+class A {
+    protected constructor() {}
+}
+```
+
+:::
+
+### allow: decoratedFunctions
+
+Examples of **correct** TypeScript code for the `{ "allow": ["decoratedFunctions"] }` option:
+
+::: correct
+
+```ts
+/*eslint no-empty-function: ["error", { "allow": ["decoratedFunctions"] }]*/
+
+class A {
+    @decorator
+    foo() {}
+}
+```
+
+:::
+
+### allow: overrideMethods
+
+Examples of **correct** TypeScript code for the `{ "allow": ["overrideMethods"] }` option:
+
+::: correct
+
+```ts
+/*eslint no-empty-function: ["error", { "allow": ["overrideMethods"] }]*/
+
+abstract class Base {
+    abstract method(): void;
+}
+
+class Derived extends Base {
+    override method() {}
 }
 ```
 

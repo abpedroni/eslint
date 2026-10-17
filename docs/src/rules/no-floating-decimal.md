@@ -1,11 +1,7 @@
 ---
 title: no-floating-decimal
-layout: doc
 rule_type: suggestion
 ---
-
-
-
 Float values in JavaScript contain a decimal point, and there is no requirement that the decimal point be preceded or followed by a number. For example, the following are all valid JavaScript numbers:
 
 ```js
